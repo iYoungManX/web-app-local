@@ -20,4 +20,4 @@ change the database, username and password to yours
 ```aidl
 src/main/java/com/csye6225/Csye6225Application.java
 ```
-to run the application
+to run the application sucessfully
