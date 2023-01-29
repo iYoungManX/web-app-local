@@ -10,9 +10,13 @@ name: HW-1 CI
 
 on:
   push:
-    branches: [ "main", "hw1-dev"]
+    branches:
+      - main
+      - hw1-dev
   pull_request:
-    branches: [ "main" ,"hw1-dev"]
+    branches:
+      - main
+      - hw1-dev
 
 jobs:
   build:
