@@ -19,7 +19,7 @@ on:
       - hw1-dev
 
 jobs:
-  build:
+  hw1-CI:
 
     runs-on: ubuntu-latest
 
