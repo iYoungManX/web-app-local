@@ -40,5 +40,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity handleUnauthorizedException(ChangeOthersInfoException e){
         return ResponseEntity.badRequest().body(e.getMessage());
     }
+
+
+    @ExceptionHandler(GetOthersInfoException.class)
+    public ResponseEntity handleUnauthorizedException(GetOthersInfoException e){
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
 }
 
