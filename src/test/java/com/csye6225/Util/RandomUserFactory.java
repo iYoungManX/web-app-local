@@ -3,7 +3,7 @@ package com.csye6225.Util;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.PropertyNamingStrategy;
 import com.alibaba.fastjson.serializer.SerializeConfig;
-import com.csye6225.POJO.User;
+import com.csye6225.Util.User;
 import com.github.javafaker.Faker;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.Base64;
 import java.util.Random;
 
 
@@ -48,5 +49,11 @@ public class RandomUserFactory {
                 .andReturn()
                 .getResponse();
 
+    }
+
+    public String getAuthToken(String username, String password) {
+        String encoding = Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
+        String authHeader = "Basic " + encoding;
+        return authHeader;
     }
 }

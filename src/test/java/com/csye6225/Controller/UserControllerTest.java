@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.parser.Feature;
 import com.csye6225.Util.ErrorMessage;
 import com.csye6225.VO.UserVO;
-import com.csye6225.POJO.User;
+import com.csye6225.Util.User;
 import com.csye6225.Util.RandomUserFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,6 +28,7 @@ class UserControllerTest {
     @Autowired
     MockMvc mockMvc;
 
+
     @Autowired
     RandomUserFactory randomUserFactory;
 
@@ -46,9 +47,11 @@ class UserControllerTest {
     @DisplayName("Test Create User (correct email)")
     public void testCreateUser() throws Exception{
 
+
         User user = randomUserFactory.getRandomUser();
         System.out.println(user.getUsername());
         String jsonbody =randomUserFactory.parseUserToJson(user);
+        System.out.println(jsonbody);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/v1/user/")
                         .content(jsonbody).contentType(MediaType.APPLICATION_JSON))
@@ -103,12 +106,12 @@ class UserControllerTest {
         User user = randomUserFactory.getRandomUser();
         String jsonbody = randomUserFactory.parseUserToJson(user);
         MockHttpServletResponse response = randomUserFactory.sendCreateUserRequest("/v1/user/", jsonbody);
-        this.token = response.getHeader("token");
+        this.token = randomUserFactory.getAuthToken(user.getUsername(), user.getPassword());
         this.id = JSON.parseObject(response.getContentAsString(), UserVO.class, Feature.DisableFieldSmartMatch ).getId();
 
         mockMvc.perform(MockMvcRequestBuilders
                 .get("/v1/user/"+ this.id)
-                .header("token", this.token))
+                .header("Authorization", this.token))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("id").value(this.id.toString()))
                 .andExpect(MockMvcResultMatchers.jsonPath("username").value(user.getUsername()))
@@ -132,8 +135,7 @@ class UserControllerTest {
 
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/v1/user/"+ this.id))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().string(ErrorMessage.UNAUTHORIZED))
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized())
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
     }
@@ -146,13 +148,12 @@ class UserControllerTest {
         MockHttpServletResponse response = randomUserFactory.sendCreateUserRequest("/v1/user/", jsonbody);
 
         this.id = JSON.parseObject(response.getContentAsString(), UserVO.class, Feature.DisableFieldSmartMatch ).getId();
-        this.token = response.getHeader("token");
+        this.token =  randomUserFactory.getAuthToken(user.getUsername(), user.getPassword());;
         String wrongToken = this.token.substring(1);
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/v1/user/"+ this.id)
-                .header("token", wrongToken))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().string(ErrorMessage.UNAUTHORIZED))
+                .header("Authorization", wrongToken))
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized())
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
     }
@@ -167,13 +168,14 @@ class UserControllerTest {
         MockHttpServletResponse response = randomUserFactory.sendCreateUserRequest("/v1/user/", jsonbody);
 
         this.id = JSON.parseObject(response.getContentAsString(), UserVO.class, Feature.DisableFieldSmartMatch ).getId();
-        this.token = response.getHeader("token");
+        this.token =  randomUserFactory.getAuthToken(user.getUsername(), user.getPassword());;
+
 
         user.setUsername("john@doeemail.com"+ random.nextInt());
         jsonbody = randomUserFactory.parseUserToJson(user);
         mockMvc.perform(MockMvcRequestBuilders
                         .put("/v1/user/"+ this.id)
-                        .header("token", this.token)
+                        .header("Authorization", this.token)
                         .content(jsonbody).contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
@@ -189,12 +191,13 @@ class UserControllerTest {
         String jsonbody = randomUserFactory.parseUserToJson(user);
         MockHttpServletResponse response = randomUserFactory.sendCreateUserRequest("/v1/user/", jsonbody);
 
-        this.token = response.getHeader("token");
+        this.token =  randomUserFactory.getAuthToken(user.getUsername(), user.getPassword());
+
         this.id = JSON.parseObject(response.getContentAsString(), UserVO.class, Feature.DisableFieldSmartMatch ).getId();
 
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/v1/user/"+ this.id)
-                        .header("token", this.token))
+                        .header("Authorization", this.token))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("password").doesNotExist())
                 .andDo(MockMvcResultHandlers.print())
@@ -205,7 +208,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("Change others inforamtion tests")
-    public void testChangOtherInformation() throws Exception {
+    public void testChangeOtherInformation() throws Exception {
         // create user 1
         User user1 = randomUserFactory.getRandomUser();
         String jsonbody1 = randomUserFactory.parseUserToJson(user1);
@@ -217,7 +220,7 @@ class UserControllerTest {
         MockHttpServletResponse response2 = randomUserFactory.sendCreateUserRequest("/v1/user/", jsonbody2);
 
         // get user 1's token
-        String token1 = response1.getHeader("token");
+        String token1 =  randomUserFactory.getAuthToken(user1.getUsername(), user1.getPassword());
 
         Long id2 = JSON.parseObject(response2.getContentAsString(), UserVO.class, Feature.IgnoreNotMatch ).getId();
         user1.setUsername("john@doil.com"+ random.nextInt());
@@ -225,7 +228,7 @@ class UserControllerTest {
         // use user1 1's token to get user 2's information
         mockMvc.perform(MockMvcRequestBuilders
                         .put("/v1/user/"+ id2)
-                        .header("token", token1)
+                        .header("Authorization", token1)
                         .content(jsonbody1).contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
