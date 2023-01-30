@@ -39,9 +39,9 @@ public class User implements UserDetails {
     private String lastName;
     @CreatedDate
     @JsonProperty("account_created")
-
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date accountCreated;
+
     @LastModifiedDate
     @JsonProperty("account_updated")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")

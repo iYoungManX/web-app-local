@@ -1,6 +1,7 @@
 package com.csye6225.Controller;
 
 import com.csye6225.Exception.GetOthersInfoException;
+import com.csye6225.Exception.InvalidUpdateException;
 import com.csye6225.Util.ErrorMessage;
 import com.csye6225.Util.UserHolder;
 import com.csye6225.VO.UserVO;
@@ -41,6 +42,17 @@ public class UserController {
 
     @PutMapping ("/{id}")
     public void updateUser(@PathVariable Long id, @RequestBody User user) {
+
+        User unAuthUser = UserHolder.getUser();
+        if(!unAuthUser.getId().equals(id)){
+            throw new ChangeOthersInfoException(ErrorMessage.CHANGE_OTHER_INFORMATION);
+        }
+
+        if(!user.getUsername().equals(unAuthUser.getUsername()) ||
+                user.getAccountUpdated()!=null ||
+                user.getAccountCreated()!=null){
+            throw new InvalidUpdateException(ErrorMessage.INVALID_UPDATE_OTHER_INFORMATION);
+        }
 
         userService.updateUser(id, user);
     }

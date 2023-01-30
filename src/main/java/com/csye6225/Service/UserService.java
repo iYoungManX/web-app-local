@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -35,7 +36,8 @@ public class UserService implements UserDetailsService {
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public UserVO getUser(Long id){
-        User user = userRepositorty.findById(id).get();
+        Optional<User> users = userRepositorty.findById(id);
+        User user = users.get();
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(user, userVO);
         return userVO;
@@ -65,27 +67,8 @@ public class UserService implements UserDetailsService {
     }
 
     public void updateUser(Long id, User user) {
-
-        User unAuthUser = UserHolder.getUser();
-        if(!unAuthUser.getId().equals(id)){
-            throw new ChangeOthersInfoException(ErrorMessage.CHANGE_OTHER_INFORMATION);
-        }
-
-        if(!user.getUsername().equals(unAuthUser.getUsername()) ||
-                user.getAccountUpdated()!=null ||
-                    user.getAccountCreated()!=null){
-            throw new InvalidUpdateException(ErrorMessage.INVALID_UPDATE_OTHER_INFORMATION);
-        }
-
-
-
         User oldUser = userRepositorty.findById(id).get();
-        Date createdTime = oldUser.getAccountCreated();
-        String username = oldUser.getUsername();
-        BeanUtils.copyProperties(user,oldUser);
-        oldUser.setId(id);
-        oldUser.setAccountCreated(createdTime);
-        oldUser.setUsername(username);
+        BeanUtils.copyProperties(user,oldUser,"createdTime","username","id");
         oldUser.setPassword(bCryptPasswordEncoder.encode(oldUser.getPassword()));
         userRepositorty.save(oldUser);
     }
