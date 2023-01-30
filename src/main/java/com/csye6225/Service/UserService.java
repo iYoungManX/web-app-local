@@ -35,12 +35,6 @@ public class UserService implements UserDetailsService {
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public UserVO getUser(Long id){
-
-        User unAuthUser = UserHolder.getUser();
-        if(!unAuthUser.getId().equals(id)){
-            throw new GetOthersInfoException(ErrorMessage.GET_OTHER_INFORMATION);
-        }
-
         User user = userRepositorty.findById(id).get();
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(user, userVO);
@@ -77,7 +71,7 @@ public class UserService implements UserDetailsService {
             throw new ChangeOthersInfoException(ErrorMessage.CHANGE_OTHER_INFORMATION);
         }
 
-        if(user.getUsername()!= null ||
+        if(!user.getUsername().equals(unAuthUser.getUsername()) ||
                 user.getAccountUpdated()!=null ||
                     user.getAccountCreated()!=null){
             throw new InvalidUpdateException(ErrorMessage.INVALID_UPDATE_OTHER_INFORMATION);
@@ -92,6 +86,7 @@ public class UserService implements UserDetailsService {
         oldUser.setId(id);
         oldUser.setAccountCreated(createdTime);
         oldUser.setUsername(username);
+        oldUser.setPassword(bCryptPasswordEncoder.encode(oldUser.getPassword()));
         userRepositorty.save(oldUser);
     }
 

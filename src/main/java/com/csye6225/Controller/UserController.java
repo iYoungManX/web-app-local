@@ -24,6 +24,11 @@ public class UserController {
     @GetMapping("/{id}")
     public UserVO getUser(@PathVariable Long id) {
 
+        User unAuthUser = UserHolder.getUser();
+        if(!unAuthUser.getId().equals(id)){
+            throw new GetOthersInfoException(ErrorMessage.GET_OTHER_INFORMATION);
+        }
+
         return userService.getUser(id);
     }
 
