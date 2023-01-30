@@ -34,7 +34,6 @@ public class WebSecurityConfig {
     BCryptPasswordEncoder bcryptPasswordEncoder;
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-
         return (web) -> web.ignoring().requestMatchers("/v1/user/","/v1/user","/healthz","/healthz/");
     }
 
