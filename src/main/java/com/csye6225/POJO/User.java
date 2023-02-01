@@ -27,6 +27,7 @@ import java.util.List;
 @Table(name = "Users")
 public class User implements UserDetails {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @Email(message = "Invalid email format")
     private String username;

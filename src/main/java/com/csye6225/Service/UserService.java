@@ -46,9 +46,6 @@ public class UserService implements UserDetailsService {
         // prevent user change the create and update times
         user.setAccountCreated(null);
         user.setAccountUpdated(null);
-        // generate user id
-        Long id = UIDUtil.nextId();
-        user.setId(id);
 
         List<User> users = userRepositorty.findByUsername(user.getUsername());
         if(users!= null && users.size()>0){
@@ -60,8 +57,7 @@ public class UserService implements UserDetailsService {
         userRepositorty.save(user);
         // return the user information
         UserVO userVO = new UserVO();
-        User newUser = userRepositorty.findById(id).get();
-        BeanUtils.copyProperties(newUser, userVO);
+        BeanUtils.copyProperties(user, userVO);
         return userVO;
     }
 
