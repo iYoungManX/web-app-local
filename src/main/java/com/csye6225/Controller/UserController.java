@@ -48,8 +48,7 @@ public class UserController {
             throw new ChangeOthersInfoException(ErrorMessage.CHANGE_OTHER_INFORMATION);
         }
 
-        if(!user.getUsername().equals(unAuthUser.getUsername()) ||
-                user.getAccountUpdated()!=null ||
+        if(user.getUsername()!=null ||user.getAccountUpdated()!=null ||
                 user.getAccountCreated()!=null){
             throw new InvalidUpdateException(ErrorMessage.INVALID_UPDATE_OTHER_INFORMATION);
         }

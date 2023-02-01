@@ -1,23 +1,23 @@
-#spring:
-#  datasource:
-#    driver-class-name: org.h2.Driver
-#    url: jdbc:h2:mem:testdb
-#    username: sa
-#    password: sa
-#  jpa:
-#    show-sql: true
-#    hibernate:
-#      ddl-auto: create-drop
-
-
-
 spring:
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/csye6225db
-    username: root
-    password: root
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password: sa
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
+
+
+#
+#spring:
+#  datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://localhost:3306/csye6225db
+#    username: root
+#    password: root
+#  jpa:
+#    show-sql: true
+#    hibernate:
+#      ddl-auto: update

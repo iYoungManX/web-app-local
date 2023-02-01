@@ -3,6 +3,7 @@ package com.csye6225.Exception;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.csye6225.Util.ErrorMessage;
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -38,13 +39,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ChangeOthersInfoException.class)
     public ResponseEntity handleUnauthorizedException(ChangeOthersInfoException e){
-        return ResponseEntity.badRequest().body(e.getMessage());
+        return ResponseEntity.status(HttpStatusCode.valueOf(403))
+        .body(e.getMessage());
     }
 
 
     @ExceptionHandler(GetOthersInfoException.class)
     public ResponseEntity handleUnauthorizedException(GetOthersInfoException e){
-        return ResponseEntity.badRequest().body(e.getMessage());
+        return ResponseEntity.status(HttpStatusCode.valueOf(403)).body(e.getMessage());
     }
 }
 
