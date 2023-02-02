@@ -36,7 +36,9 @@ public class UserService implements UserDetailsService {
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public UserVO getUser(Long id){
+
         User user  = userRepositorty.findById(id).get();
+
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(user, userVO);
         return userVO;
@@ -62,7 +64,6 @@ public class UserService implements UserDetailsService {
     }
 
     public void updateUser(Long id, User user) {
-
         User oldUser = userRepositorty.findById(id).get();
         BeanUtils.copyProperties(user,oldUser,"createdTime","username","id");
         oldUser.setPassword(bCryptPasswordEncoder.encode(oldUser.getPassword()));
