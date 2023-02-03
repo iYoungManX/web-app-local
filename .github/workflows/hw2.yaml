@@ -23,15 +23,15 @@ jobs:
 
     runs-on: ubuntu-latest
 
-#    services:
-#      mysql:
-#        image: mysql:8.0.21
-#        env:
-#          MYSQL_ROOT_PASSWORD: root
-#          MYSQL_DATABASE: csye6225db
-#        ports:
-#          - 3306:3306
-#        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
+    services:
+      mysql:
+        image: mysql:8.0.21
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: csye6225db
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 17
@@ -40,6 +40,10 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
+
+      - name: Verify csye6250db DB exists
+        run: mysql --host 127.0.0.1 --port 3306 -uroot -proot -e "SHOW DATABASES LIKE 'csye6225db'"
+
 
 
       - name: Build with Maven
