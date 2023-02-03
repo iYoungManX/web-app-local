@@ -1,7 +1,9 @@
 package com.csye6225.Util;
 
 import com.csye6225.POJO.User;
+import org.springframework.stereotype.Component;
 
+@Component
 public class UserHolder {
 
     private static final ThreadLocal<User> tl = new ThreadLocal<>();

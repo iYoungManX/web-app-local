@@ -1,15 +1,11 @@
 package com.csye6225.Service;
 
-import com.csye6225.Exception.ChangeOthersInfoException;
-import com.csye6225.Exception.GetOthersInfoException;
 import com.csye6225.Util.ErrorMessage;
 import com.csye6225.Util.UserHolder;
 import com.csye6225.VO.UserVO;
-import com.csye6225.Exception.InvalidUpdateException;
-import com.csye6225.Exception.RepeatEmailException;
+import com.csye6225.Exception.UserException.RepeatEmailException;
 import com.csye6225.POJO.User;
 import com.csye6225.Repository.UserRepository;
-import com.csye6225.Util.UIDUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +15,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 
 @Service
@@ -71,12 +65,11 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepositorty.getUserByUsername(username);
+        User user = userRepositorty.getUserByUsername(username); //IO
         if(user ==null){
             log.error("User not found");
             throw new UsernameNotFoundException("Username " + username +"not found");
         }else{
-
             // save user to thread local storage
             UserHolder.saveUser(user);
             return user;
