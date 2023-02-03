@@ -53,7 +53,6 @@ public class RandomUserFactory {
 
     public String getAuthToken(String username, String password) {
         String encoding = Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
-        String authHeader = "Basic " + encoding;
-        return authHeader;
+        return "Basic " + encoding;
     }
 }
