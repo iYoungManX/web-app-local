@@ -29,7 +29,7 @@ public class RandomProductFactory {
         Product product = new Product();
         product.setName(faker.food().ingredient());
         product.setDescription(faker.lorem().paragraph());
-        product.setSku(faker.random().toString());
+        product.setSku(faker.random().toString()+random.nextInt());
         product.setManufacturer(faker.company().name());
         product.setQuantity(Math.abs(faker.random().nextLong(300)));
         return product;
