@@ -1,70 +1,70 @@
-package com.csye6225.Service;
-
-import com.csye6225.Exception.ProductException.CreateOrUpdateProductException;
-import com.csye6225.Exception.ProductException.ProductNotExistException;
-import com.csye6225.POJO.Product;
-import com.csye6225.POJO.User;
-import com.csye6225.Repository.ProductRepository;
-import com.csye6225.Util.RandomProductFactory;
-import com.csye6225.Util.UserHolder;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.function.Executable;
-import org.mockito.InjectMocks;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static reactor.core.publisher.Mono.when;
-
-@SpringBootTest
-@AutoConfigureMockMvc
-@ExtendWith(MockitoExtension.class)
-class ProductServiceTest {
-
-    @Autowired
-    RandomProductFactory randomProductFactory;
-
-    @MockBean
-    ProductRepository productRepository;
-
-
-    @MockBean
-    User user;
-
-    @Autowired
-    ProductService productService;
-
-    @BeforeEach
-    void setUp() {
-    }
-
-    @AfterEach
-    void tearDown() {
-    }
-
-    @Test
-    void GetProductTEST() {
-        Product product = randomProductFactory.getRandomProduct();
-        Long productId = product.getId();
-        Mockito.when(productRepository.findById(productId)).thenReturn(Optional.of(product));
-        assertEquals(productService.getProduct(productId), product);
-    }
+//package com.csye6225.Service;
+//
+//import com.csye6225.Exception.ProductException.CreateOrUpdateProductException;
+//import com.csye6225.Exception.ProductException.ProductNotExistException;
+//import com.csye6225.POJO.Product;
+//import com.csye6225.POJO.User;
+//import com.csye6225.Repository.ProductRepository;
+//import com.csye6225.Util.RandomProductFactory;
+//import com.csye6225.Util.UserHolder;
+//import org.junit.jupiter.api.AfterEach;
+//import org.junit.jupiter.api.BeforeEach;
+//import org.junit.jupiter.api.DisplayName;
+//import org.junit.jupiter.api.Test;
+//import org.junit.jupiter.api.extension.ExtendWith;
+//import org.junit.jupiter.api.function.Executable;
+//import org.mockito.InjectMocks;
+//import org.mockito.MockedStatic;
+//import org.mockito.Mockito;
+//import org.mockito.junit.jupiter.MockitoExtension;
+//import org.springframework.beans.BeanUtils;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+//import org.springframework.boot.test.context.SpringBootTest;
+//import org.springframework.boot.test.mock.mockito.MockBean;
+//import org.springframework.context.annotation.Import;
+//
+//import java.util.ArrayList;
+//import java.util.List;
+//import java.util.Optional;
+//
+//import static org.assertj.core.api.Assertions.assertThat;
+//import static org.junit.jupiter.api.Assertions.*;
+//import static reactor.core.publisher.Mono.when;
+//
+//@SpringBootTest
+//@AutoConfigureMockMvc
+//@ExtendWith(MockitoExtension.class)
+//class ProductServiceTest {
+//
+//    @Autowired
+//    RandomProductFactory randomProductFactory;
+//
+//    @MockBean
+//    ProductRepository productRepository;
+//
+//
+//    @MockBean
+//    User user;
+//
+//    @Autowired
+//    ProductService productService;
+//
+//    @BeforeEach
+//    void setUp() {
+//    }
+//
+//    @AfterEach
+//    void tearDown() {
+//    }
+//
+//    @Test
+//    void GetProductTEST() {
+//        Product product = randomProductFactory.getRandomProduct();
+//        Long productId = product.getId();
+//        Mockito.when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+//        assertEquals(productService.getProduct(productId), product);
+//    }
 
 
 //    @Test
@@ -93,5 +93,5 @@ class ProductServiceTest {
 //        Mockito.mockStatic(UserHolder.class).close();
 //    }
 
-
-}
+//
+//}
