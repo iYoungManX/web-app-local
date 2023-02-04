@@ -5,10 +5,12 @@ import com.csye6225.Exception.ProductException.NoContentException;
 import com.csye6225.Exception.ProductException.ProductNotExistException;
 import com.csye6225.Exception.UserException.ChangeOthersInfoException;
 import com.csye6225.POJO.Product;
+import com.csye6225.POJO.User;
 import com.csye6225.Repository.ProductRepository;
 import com.csye6225.Util.ErrorMessage;
 import com.csye6225.Util.UserHolder;
 import io.netty.util.internal.StringUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class ProductService {
 
     @Autowired
@@ -29,8 +32,10 @@ public class ProductService {
         // check for the product
         Optional<Product> product = productRepository.findById(productId);
         if(product.isPresent()){
+            log.info("User {}: Get the product {}", UserHolder.getUser().getId(), productId);
             return product.get();
         }else{
+            log.warn("User {}: The product doesn't exist ",UserHolder.getUser().getId());
             throw new ProductNotExistException(ErrorMessage.PRODUCT_NOT_EXIST);  //400
         }
 
@@ -92,10 +97,13 @@ public class ProductService {
                 || StringUtils.isEmpty(product.getManufacturer())
                 || StringUtils.isEmpty(product.getSku())
                 || product.getQuantity() ==null){
+            log.warn("Some required fields of the product is missing");
             throw new NoContentException(ErrorMessage.NO_CONTENT);
         }
+        log.info("The product has all the required fields");
         // check is quantity is correct  400
         if( product.getQuantity()< 0){
+            log.warn("The product quantity is less than 0");
             throw new CreateOrUpdateProductException(ErrorMessage.PRODUCT_QUANTITY_ERROR);
         }
     }
@@ -104,6 +112,8 @@ public class ProductService {
     private void checkAuth(Product oldProduct){
         // check is quantity is correct  404
         if(!Objects.equals(oldProduct.getOwnerUserId(), UserHolder.getUser().getId())){
+            log.warn("User {} is trying to the get User {} 's product with ProductId: {} "
+                    ,UserHolder.getUser().getId(), oldProduct.getOwnerUserId(), oldProduct.getId());
             throw new ChangeOthersInfoException(ErrorMessage.CHANGE_OTHER_INFORMATION);
         }
     }
