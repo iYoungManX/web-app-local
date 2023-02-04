@@ -8,6 +8,8 @@ import com.csye6225.POJO.Product;
 import com.csye6225.Repository.ProductRepository;
 import com.csye6225.Util.ErrorMessage;
 import com.csye6225.Util.UserHolder;
+import io.netty.util.internal.StringUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -84,10 +86,11 @@ public class ProductService {
 
     private void checkProduct(Product product){
         // check if all field exists  no content 204
-        if(product.getName().isEmpty()
-                || product.getDescription().isEmpty()
-                || product.getManufacturer().isEmpty()
-                || product.getSku().isEmpty()
+
+        if( StringUtils.isEmpty(product.getName())
+                || StringUtils.isEmpty(product.getDescription())
+                || StringUtils.isEmpty(product.getManufacturer())
+                || StringUtils.isEmpty(product.getSku())
                 || product.getQuantity() ==null){
             throw new NoContentException(ErrorMessage.NO_CONTENT);
         }

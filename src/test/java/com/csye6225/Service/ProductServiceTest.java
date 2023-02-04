@@ -75,22 +75,23 @@ class ProductServiceTest {
         assertThrows(ProductNotExistException.class, ()-> productService.getProduct(productId));
     }
 
-//    @Test
-//    void CreateProductTEST() {
-//        Product product = randomProductFactory.getRandomProduct();
-//        product.setId(10L);
-//        Mockito.when(productRepository.findBySku(product.getSku())).thenReturn(null);
-//        Product product2 = new Product();
-//        BeanUtils.copyProperties(product, product2);
-//        product2.setOwnerUserId(100L);
-//        Mockito.when(productRepository.save(product)).thenReturn(product2);
-//        User user = new User();
-//        user.setId(100L);
-//        // this is how to mock the static methods
-//        Mockito.mockStatic(UserHolder.class);
-//        Mockito.when(UserHolder.getUser()).thenReturn(user);
-//        assertEquals(product2, productService.createProduct(product));
-//    }
+    @Test
+    void CreateProductTEST() {
+        Product product = randomProductFactory.getRandomProduct();
+        product.setId(10L);
+        Mockito.when(productRepository.findBySku(product.getSku())).thenReturn(null);
+        Product product2 = new Product();
+        BeanUtils.copyProperties(product, product2);
+        product2.setOwnerUserId(100L);
+        Mockito.when(productRepository.save(product)).thenReturn(product2);
+        User user = new User();
+        user.setId(100L);
+        // this is how to mock the static methods
+        Mockito.mockStatic(UserHolder.class);
+        Mockito.when(UserHolder.getUser()).thenReturn(user);
+        assertEquals(product2, productService.createProduct(product));
+        Mockito.mockStatic(UserHolder.class).close();
+    }
 
 
 }
