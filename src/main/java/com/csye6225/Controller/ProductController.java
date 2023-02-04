@@ -21,7 +21,7 @@ public class ProductController {
     @PostMapping("/")
     public ResponseEntity<Product> createProduct(@RequestBody Product product) {
         Product newProduct = productService.createProduct(product);
-        return ResponseEntity.status(201).body(newProduct);
+        return ResponseEntity.status(204).body(newProduct);
     }
 
     @PutMapping("/{productId}")

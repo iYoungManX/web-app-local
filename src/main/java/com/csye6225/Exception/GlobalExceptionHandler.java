@@ -67,7 +67,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NoContentException.class)
     public ResponseEntity<String> handleNoContentException(NoContentException e){
-            return ResponseEntity.status(204).body(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)

@@ -63,7 +63,7 @@ class ProductControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/v1/product/")
                         .content(jsonbody).contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", this.token))
-                .andExpect(MockMvcResultMatchers.status().is(201))
+                .andExpect(MockMvcResultMatchers.status().is(204))
                 .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath("name").value(product.getName()))
                 .andExpect(MockMvcResultMatchers.jsonPath("description").value(product.getDescription()))

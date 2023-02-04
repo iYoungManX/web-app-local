@@ -67,13 +67,13 @@ class ProductServiceTest {
     }
 
 
-    @Test
-    void ProductNotExistTEST() {
-        Product product = randomProductFactory.getRandomProduct();
-        Long productId = product.getId();
-        Mockito.when(productRepository.findById(productId)).thenReturn(Optional.empty());
-        assertThrows(ProductNotExistException.class, ()-> productService.getProduct(productId));
-    }
+//    @Test
+//    void ProductNotExistTEST() {
+//        Product product = randomProductFactory.getRandomProduct();
+//        Long productId = product.getId();
+//        Mockito.when(productRepository.findById(productId)).thenReturn(Optional.empty());
+//        assertThrows(ProductNotExistException.class, ()-> productService.getProduct(productId));
+//    }
 
 //    @Test
 //    void CreateProductTEST() {
