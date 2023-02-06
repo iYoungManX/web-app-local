@@ -72,7 +72,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<String> handleHttpMessageNotReadableException(HttpMessageNotReadableException e){
-        return ResponseEntity.badRequest().body(ErrorMessage.QUANTITY_ERROR);
+        return ResponseEntity.badRequest().body(ErrorMessage.PARSE_ERROR);
     }
 
 }

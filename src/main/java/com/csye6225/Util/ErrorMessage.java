@@ -22,6 +22,6 @@ public class ErrorMessage {
 
     public static final String NO_CONTENT ="Please enter all the necessary fields";
 
-    public static final String QUANTITY_ERROR = "quantity must be a number";
+    public static final String PARSE_ERROR = "Can't parse the input";
 
 }

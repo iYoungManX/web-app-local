@@ -28,11 +28,11 @@ public class Product {
     @CreatedDate
     @JsonProperty("date_added")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private String dateAdded;
+    private Date dateAdded;
     @LastModifiedDate
     @JsonProperty("date_last_updated")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private String dateLastUpdated;
+    private Date dateLastUpdated;
     @JsonProperty("owner_userid")
     private Long ownerUserId;
 }
