@@ -32,10 +32,10 @@ public class ProductService {
         // check for the product
         Optional<Product> product = productRepository.findById(productId);
         if(product.isPresent()){
-            log.info("User {}: Get the product {}", UserHolder.getUser().getId(), productId);
+//            log.info("User {}: Get the product {}", UserHolder.getUser().getId(), productId);
             return product.get();
         }else{
-            log.warn("User {}: The product doesn't exist ",UserHolder.getUser().getId());
+//            log.warn("User {}: The product doesn't exist ",UserHolder.getUser().getId());
             throw new ProductNotExistException(ErrorMessage.PRODUCT_NOT_EXIST);  //400
         }
 
