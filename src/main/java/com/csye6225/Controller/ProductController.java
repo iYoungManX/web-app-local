@@ -25,15 +25,15 @@ public class ProductController {
     }
 
     @PutMapping("/{productId}")
-    public String updateProduct(@PathVariable Long productId,@RequestBody Product product){
+    public ResponseEntity<String> updateProduct(@PathVariable Long productId,@RequestBody Product product){
         productService.updateProduct(productId,product);
-        return "Updated successfully";
+        return ResponseEntity.status(204).body("Update successful");
     }
 
     @PatchMapping("/{productId}")
-    public String patchProduct(@PathVariable Long productId,@RequestBody Product product){
+    public ResponseEntity<String> patchProduct(@PathVariable Long productId,@RequestBody Product product){
         productService.updateProduct(productId,product);
-        return "Updated successfully";
+        return ResponseEntity.status(204).body("Update successful");
     }
 
     @DeleteMapping("/{productId}")
