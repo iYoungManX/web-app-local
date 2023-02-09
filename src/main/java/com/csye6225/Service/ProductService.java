@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -48,7 +49,7 @@ public class ProductService {
         // check if sku is repeated   404
         List<Product> existingProducts =
                 productRepository.findBySku(product.getSku());
-        if(existingProducts!=null && existingProducts.size()>0){
+        if(!CollectionUtils.isEmpty(existingProducts)){
             throw new CreateOrUpdateProductException(ErrorMessage.REPEAT_SKU);
         }
 
@@ -68,7 +69,7 @@ public class ProductService {
         // check if sku is repeated   400 bad request
         List<Product> existingProducts = productRepository.findBySku(product.getSku());
         if(!oldProduct.getSku().equals(product.getSku())
-                && existingProducts!=null && existingProducts.size()>0){
+                && !CollectionUtils.isEmpty(existingProducts)){
             throw new CreateOrUpdateProductException(ErrorMessage.REPEAT_SKU);
         }
         // update the product
