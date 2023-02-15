@@ -231,7 +231,7 @@ class UserControllerTest {
                         .header("Authorization", token1)
                         .content(jsonbody1).contentType(MediaType.APPLICATION_JSON)
                 )
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.content().string(ErrorMessage.CHANGE_OTHER_INFORMATION))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
