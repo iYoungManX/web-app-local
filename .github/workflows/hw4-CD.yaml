@@ -8,10 +8,9 @@
 
 name: HW-4 CD
 on:
-  pull_request:
+  push:
     branches:
       - main
-    types: [closed]
 
 jobs:
   build-image:
