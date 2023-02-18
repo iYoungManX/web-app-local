@@ -1,1 +1,0 @@
-cat pack.log | grep amazon-ebs: AMI: ami-
