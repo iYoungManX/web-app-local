@@ -41,9 +41,11 @@ jobs:
         with:
           version: "1.8.3" # or `latest`
 
+
       - name: check environment variables
         run: echo $DEV_ACCOUNT_ID
 
 #      - name: Run packer build
 #        run: cd packer && packer build pack.json
+
 
