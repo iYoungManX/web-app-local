@@ -5,13 +5,11 @@
       "access_key": "{{user `aws_access_key`}}",
       "secret_key": "{{user `aws_secret_key`}}",
       "source_ami":"ami-0f1a5f5ada0e7da53",
-
       "region": "{{user `aws_region`}}",
-
       "instance_type": "t2.micro",
       "ssh_username": "ec2-user",
       "ami_name": "webapp-{{timestamp}}",
-      "ami_users": ["{{user `demo_account_id`}}","{{user `dev_account_id`}}"]
+      "ami_users": ["050297369388","435646449189"]
     }
 
   ],
@@ -27,7 +25,18 @@
       "source": "../docker-compose.yml",
       "destination": "/tmp/docker-compose.yml"
     },
-
+    {
+      "type": "file",
+      "source": "launch.sh",
+      "destination": "/tmp/launch.sh"
+    },
+    {"type": "shell",
+      "inline": [
+        "sudo chmod +x /tmp/launch.sh",
+        "sudo chmod +x /tmp/docker-compose.yml",
+        "sudo cp /tmp/launch.sh /var/lib/cloud/scripts/per-boot/launch.sh",
+        "sudo cp /tmp/launch.sh /var/lib/cloud/scripts/per-instance/launch.sh"
+      ]},
     {
       "type": "file",
       "source": "../Dockerfile",
