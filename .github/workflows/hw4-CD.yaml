@@ -35,4 +35,5 @@ jobs:
         with:
           version: "1.8.3" # or `latest`
       - name: Run packer build
-        run: cd packer && packer build packer/pack.json
+        run: cd packer && packer build pack.json
+

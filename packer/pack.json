@@ -11,7 +11,7 @@
       "instance_type": "t2.micro",
       "ssh_username": "ec2-user",
       "ami_name": "webapp-{{timestamp}}",
-      "ami_users": ["{{user `demo_account_id`}}"]
+      "ami_users": ["{{user `demo_account_id`}}","{{user `dev_account_id`}}"]
     }
 
   ],
@@ -47,6 +47,7 @@
     "aws_access_key": "{{env `AWS_ACCESS_KEY_ID`}}",
     "aws_secret_key": "{{env `AWS_SECRET_ACCESS_KEY`}}",
     "demo_account_id": "{{env `DEMO_ACCOUNT_ID`}}",
+    "dev_account_id": "{{env `DEV_ACCOUNT_ID`}}",
     "aws_region": "us-west-2"
   }
 }
