@@ -26,6 +26,12 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
+
+      - name: CI
+        run:
+          mvn test
+
+
   build-image:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
