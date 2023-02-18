@@ -10,7 +10,8 @@ name: TEST
 on:
   push:
     branches:
-      - test
+      - testEnv
+
 
 
 jobs:
