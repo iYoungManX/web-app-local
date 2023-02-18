@@ -10,7 +10,7 @@ on:
   pull_request:
     branches:
       - main
-      - hw1-dev
+
 jobs:
   hw4-CI:
     runs-on: ubuntu-latest
