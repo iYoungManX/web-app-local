@@ -9,12 +9,15 @@
 name: HW-4 CD
 
 on:
-  push:
+  pull_request:
     branches:
       - main
+    types: [closed]
+
 
 jobs:
   build-image:
+    if: github.event.pull_request.merged == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
