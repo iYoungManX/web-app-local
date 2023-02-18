@@ -5,15 +5,12 @@
 # They are provided by a third-party and are governed by
 # separate terms of service, privacy policy, and support
 # documentation.
-
 name: HW-4 CD
-
 on:
   pull_request:
     branches:
       - main
     types: [closed]
-
 
 jobs:
   build-image:
