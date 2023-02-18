@@ -12,6 +12,7 @@ on:
   push:
     branches:
       - hw4
+      - main
   pull_request:
     branches:
       - main

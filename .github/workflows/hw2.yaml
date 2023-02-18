@@ -11,12 +11,12 @@ name: HW-2 CI
 on:
   push:
     branches:
-      - main
+#      - main
       - hw2
-  pull_request:
-    branches:
-      - main
-      - hw2
+#  pull_request:
+#    branches:
+#      - main
+#      - hw2
 
 jobs:
   hw2-CI:
