@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  mysqldb:
+    image: mysql:8.0.21
+    environment:
+      MYSQL_ROOT_USER: root #root用户
+      MYSQL_ROOT_PASSWORD: root
+#      MYSQL_DATABASE: csye6225db
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+  app:
+#    image: yaozonghui1994/webapp:latest
+    depends_on:
+      - mysqldb
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: on-failure
+    ports:
+      - "8080:8080"
+
+volumes:
+  mysql_data:

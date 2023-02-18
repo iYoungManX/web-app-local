@@ -3,15 +3,18 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/csye6225db?createDatabaseIfNotExist=true
-    username: ${DB_ROOT:root}
-    password: ${DB_PASSWORD:root}
+    url: jdbc:mysql://mysqldb:3306/csye6225db?createDatabaseIfNotExist=true
+#    url: jdbc:mysql://localhost:3306/csye6225db?createDatabaseIfNotExist=true
+    username: root
+    password: root
+    hikari:
+      initialization-fail-timeout: 10000
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
 server:
-  port: ${SERVER_PORT:8080}
+  port: 8080
 
 
 

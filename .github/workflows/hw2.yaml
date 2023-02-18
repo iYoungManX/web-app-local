@@ -6,7 +6,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: HW-1 CI
+name: HW-2 CI
 
 on:
   push:
