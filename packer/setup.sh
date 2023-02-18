@@ -1,0 +1,24 @@
+## steup.h
+sudo yum update -y
+
+sudo amazon-linux-extras install docker
+
+sudo yum install docker
+
+sudo service docker start
+
+sudo usermod -a -G docker ec2-user
+
+docker info
+
+sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+
+sudo chmod +x /usr/local/bin/docker-compose
+
+docker-compose version
+
+
+
+sudo chmod 666 /var/run/docker.sock
+# shellcheck disable=SC2164
+cd /tmp && docker-compose up -d
