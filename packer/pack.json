@@ -15,6 +15,12 @@
   ],
   "provisioners": [
     {
+      "type": "shell",
+      "inline": [
+        "mkdir /tmp/target"
+      ]
+    },
+    {
       "type": "file",
       "source": "../docker-compose.yml",
       "destination": "/tmp/docker-compose.yml"
@@ -25,10 +31,6 @@
       "destination": "/tmp/launch.sh"
     },
     {
-      "type": "shell",
-      "script": "setup.sh"
-    },
-    {
       "type": "file",
       "source": "../Dockerfile",
       "destination": "/tmp/Dockerfile"
@@ -37,6 +39,10 @@
       "type": "file",
       "source": "../target/CSYE6225-0.0.1-SNAPSHOT.jar",
       "destination": "/tmp/target/CSYE6225-0.0.1-SNAPSHOT.jar"
+    },
+    {
+      "type": "shell",
+      "script": "setup.sh"
     }
   ],
   "variables": {
