@@ -32,26 +32,22 @@ variable "private_subnets_num" {
 }
 
 
+variable "profile" {
+  type = string
+  description = "profile"
+}
+
 variable "region" {
   default = "us-west-2"
   type= string
   description = "region"
 }
 
-variable "ami_id" {
+variable "ami-id" {
+  default = "ami-0f1a5f5ada0e7da53"
   type= string
+  description = "ami-id"
 }
-
-variable "aws_access_key" {
-  type= string
-}
-variable "aws_secret_access_key" {
-  type= string
-}
-
-
-
-
 
 
 
