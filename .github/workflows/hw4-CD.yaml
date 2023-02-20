@@ -44,6 +44,27 @@ jobs:
         run: echo $DEV_ACCOUNT_ID
 
       - name: Run packer build
-        run: cd packer && packer build pack.json
+        run: cd packer && packer build pack.json > ../python/packer
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+            python-version: 3.8
+
+      - name: Parse the AMI_ID with python
+        run: cd ../python/ && python parseAMI.py
+
+      - name: Check if AMI_ID is get from the environment variable
+        run: echo $TF_VAR_ami_id
+
+      - name: Set up terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Terraform Apply
+        run: cd ../aws-infra && terraform apply -auto-approve
+
+
+
+
 
 

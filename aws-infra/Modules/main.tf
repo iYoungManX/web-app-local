@@ -1,8 +1,8 @@
 
 provider "aws" {
   region  = var.region
-  profile = var.profile
-  # credentials = "~/.aws/credentials"
+  access_key = var.aws_access_key
+  secret_key = var.aws_secret_access_key
 }
 
 # Create VPC
@@ -119,7 +119,7 @@ resource "aws_security_group" "web_security_group" {
 }
 
 resource "aws_instance" "ec2-instance" {
-  ami = var.ami-id # Replace with your custom AMI ID
+  ami = var.ami_id # Replace with your custom AMI ID
   instance_type = "t2.micro"
   key_name = "yao"
   subnet_id = aws_subnet.public[0].id
