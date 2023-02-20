@@ -23,6 +23,8 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       DEMO_ACCOUNT_ID: ${{ secrets.DEMO_ACCOUNT_ID }}
       DEV_ACCOUNT_ID: ${{ secrets.DEV_ACCOUNT_ID }}
+      TF_VAR_aws_access_key: ${{ secrets.TF_VAR_aws_access_key}}
+      TF_VAR_aws_secret_access_key: ${{ secrets.TF_VAR_aws_secret_access_key}}
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 17
@@ -44,7 +46,7 @@ jobs:
         run: echo $DEV_ACCOUNT_ID
 
       - name: Run packer build
-        run: cd packer && packer build pack.json > ../python/packer
+        run: cd packer && packer build pack.json > ../python/packer && cat ../python/packer
 
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -52,7 +54,7 @@ jobs:
             python-version: 3.8
 
       - name: Parse the AMI_ID with python
-        run: cd ../python/ && python parseAMI.py
+        run: cd python/ && python parseAMI.py
 
       - name: Check if AMI_ID is get from the environment variable
         run: echo $TF_VAR_ami_id
@@ -61,7 +63,7 @@ jobs:
         uses: hashicorp/setup-terraform@v1
 
       - name: Terraform Apply
-        run: cd ../aws-infra && terraform apply -auto-approve
+        run: cd aws-infra && terraform apply -auto-approve
 
 
 
