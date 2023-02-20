@@ -14,12 +14,6 @@
 
   ],
   "provisioners": [
-        {
-          "type": "shell",
-          "inline": [
-            "mkdir /tmp/target"
-          ]
-        },
     {
       "type": "file",
       "source": "../docker-compose.yml",
@@ -30,13 +24,10 @@
       "source": "launch.sh",
       "destination": "/tmp/launch.sh"
     },
-    {"type": "shell",
-      "inline": [
-        "sudo chmod +x /tmp/launch.sh",
-        "sudo chmod +x /tmp/docker-compose.yml",
-        "sudo cp /tmp/launch.sh /var/lib/cloud/scripts/per-boot/launch.sh",
-        "sudo cp /tmp/launch.sh /var/lib/cloud/scripts/per-instance/launch.sh"
-      ]},
+    {
+      "type": "shell",
+      "script": "setup.sh"
+    },
     {
       "type": "file",
       "source": "../Dockerfile",
@@ -46,17 +37,11 @@
       "type": "file",
       "source": "../target/CSYE6225-0.0.1-SNAPSHOT.jar",
       "destination": "/tmp/target/CSYE6225-0.0.1-SNAPSHOT.jar"
-    },
-    {
-      "type": "shell",
-      "script": "setup.sh"
     }
   ],
   "variables": {
     "aws_access_key": "{{env `AWS_ACCESS_KEY_ID`}}",
     "aws_secret_key": "{{env `AWS_SECRET_ACCESS_KEY`}}",
-    "demo_account_id": "{{env `DEMO_ACCOUNT_ID`}}",
-    "dev_account_id": "{{env `DEV_ACCOUNT_ID`}}",
     "aws_region": "us-west-2"
   }
 }
