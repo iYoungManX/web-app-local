@@ -56,3 +56,6 @@ variable "ami-id" {
 
 
 
+
+
+
