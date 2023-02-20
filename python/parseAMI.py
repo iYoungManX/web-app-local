@@ -13,7 +13,8 @@ with open('packer', 'r') as f:
             break
 
 res= last_line.split(" ")[1]
-print("TF_VAR_ami_id=" + str(res))
-
+print("The parsed AMI id is: " + str(res))
+import os
+os.environ['TF_VAR_ami_id'] = res
 
 
