@@ -55,16 +55,18 @@ jobs:
             python-version: 3.8
 
       - name: Parse the AMI_ID with python
-        run: cd python && python parseAMI.py
+        run: cd python && python parseAMI.py >> $GITHUB_ENV
 
       - name: Check if AMI_ID is get from the environment variable
-        run: echo $TF_VAR_ami_id
+        run: echo ${{env.TF_VAR_ami_id}}
 
       - name: Set up terraform
         uses: hashicorp/setup-terraform@v1
 
       - name: Terraform Apply
-        run: cd aws-infra && terraform apply -auto-approve
+        env:
+          TF_VAR_ami_id: ${{ env.TF_VAR_ami_id}}
+        run: cd aws-infra && terraform init && terraform apply -auto-approve
 
 
 
