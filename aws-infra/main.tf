@@ -10,7 +10,7 @@ module "us-west-2-vpc1" {
   public_subnets_num  = 3
   private_subnets_num = 3
   availability_zones  = ["us-west-2a", "us-west-2b", "us-west-2c"]
-  ami-id              = "ami-0fa4d6e339a41985b"
+  ami-id              = "ami-02085b969af2ee4ab"
 }
 
 

@@ -14,12 +14,12 @@
 
   ],
   "provisioners": [
-        {
-          "type": "shell",
-          "inline": [
-            "mkdir /tmp/target"
-          ]
-        },
+    {
+      "type": "shell",
+      "inline": [
+        "mkdir /tmp/target"
+      ]
+    },
     {
       "type": "file",
       "source": "../docker-compose.yml",
@@ -30,13 +30,6 @@
       "source": "launch.sh",
       "destination": "/tmp/launch.sh"
     },
-    {"type": "shell",
-      "inline": [
-        "sudo chmod +x /tmp/launch.sh",
-        "sudo chmod +x /tmp/docker-compose.yml",
-        "sudo cp /tmp/launch.sh /var/lib/cloud/scripts/per-boot/launch.sh",
-        "sudo cp /tmp/launch.sh /var/lib/cloud/scripts/per-instance/launch.sh"
-      ]},
     {
       "type": "file",
       "source": "../Dockerfile",
@@ -55,8 +48,6 @@
   "variables": {
     "aws_access_key": "{{env `AWS_ACCESS_KEY_ID`}}",
     "aws_secret_key": "{{env `AWS_SECRET_ACCESS_KEY`}}",
-    "demo_account_id": "{{env `DEMO_ACCOUNT_ID`}}",
-    "dev_account_id": "{{env `DEV_ACCOUNT_ID`}}",
     "aws_region": "us-west-2"
   }
 }
