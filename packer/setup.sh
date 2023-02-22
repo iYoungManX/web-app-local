@@ -14,8 +14,10 @@ sudo chmod +x /usr/local/bin/docker-compose
 docker-compose version
 
 # shellcheck disable=SC2164
+
 cd /opt && docker-compose up -d
 
 ## configure auto start
 sudo chmod +x /opt/launch.sh
 sudo cp /opt/launch.sh /var/lib/cloud/scripts/per-boot/launch.sh
+
