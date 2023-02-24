@@ -4,7 +4,6 @@ import com.csye6225.POJO.Image;
 import com.csye6225.POJO.Product;
 import com.csye6225.Service.ImageService;
 import com.csye6225.Service.ProductService;
-import com.csye6225.VO.ImageVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -54,18 +53,18 @@ public class ProductController {
 
 
     @GetMapping("/{productId}/image")
-    public List<ImageVO> getAllImages(@PathVariable Long productId){
+    public List<Image> getAllImages(@PathVariable Long productId){
         return imageService.getAllImagesbyProductId(productId);
     }
 
     @PostMapping("/{productId}/image")
-    public ImageVO createImage(@PathVariable Long productId,@RequestParam("file") MultipartFile file) throws Exception {
+    public Image createImage(@PathVariable Long productId,@RequestParam("file") MultipartFile file) throws Exception {
         return imageService.createImage(productId,file);
     }
 
 
     @GetMapping("/{productId}/image/{imageId}")
-    public List<ImageVO> getImage(@PathVariable Long productId, @PathVariable String imageId){
+    public List<Image> getImage(@PathVariable Long productId, @PathVariable String imageId){
         return imageService.getImageById(imageId);
     }
 
