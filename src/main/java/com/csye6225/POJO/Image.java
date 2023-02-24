@@ -18,7 +18,6 @@ import java.util.Date;
 public class Image {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private String imageId;
     private String fileName;
 

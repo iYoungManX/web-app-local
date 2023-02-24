@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -90,12 +91,15 @@ public class ImageService {
 
         // update the database
         Image image = new Image();
+        image.setImageId(UUID.randomUUID().toString());
         image.setFileName(fileName);
         image.setS3BucketPath(url);
         image.setUser(UserHolder.getUser());
         image.setProduct(product);
         imageRepository.save(image);
-
-        return null;
+        ImageVO imageVO = new ImageVO();
+        BeanUtils.copyProperties(image,imageVO);
+        imageVO.setUserId(image.getUser().getId());
+        return imageVO;
     }
 }
