@@ -37,8 +37,8 @@ public class Product {
     @JsonProperty("owner_userid")
     private Long ownerUserId;
 
-    @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name="product_id")
-    private List<Image> images;
+//    @JsonIgnore
+//    @OneToMany(cascade = CascadeType.ALL)
+//    @JoinColumn(name="product_id")
+//    private List<Image> images;
 }

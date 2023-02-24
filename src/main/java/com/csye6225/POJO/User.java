@@ -45,9 +45,9 @@ public class User implements UserDetails {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date accountUpdated;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name="user_id")
-    private List<Image> images;
+//    @OneToMany(cascade = CascadeType.ALL)
+//    @JoinColumn(name="user_id")
+//    private List<Image> images;
 
 
 

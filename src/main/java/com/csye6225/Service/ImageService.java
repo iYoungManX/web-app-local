@@ -5,9 +5,13 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.csye6225.Exception.ImageException.ImageNotFoundException;
+import com.csye6225.Exception.ProductException.ProductNotExistException;
 import com.csye6225.Exception.UserException.ChangeOthersInfoException;
 import com.csye6225.POJO.Image;
+import com.csye6225.POJO.Product;
 import com.csye6225.Repository.ImageRepository;
+import com.csye6225.Repository.ProductRepository;
+import com.csye6225.Repository.UserRepository;
 import com.csye6225.Util.ErrorMessage;
 import com.csye6225.Util.UserHolder;
 import com.csye6225.VO.ImageVO;
@@ -31,6 +35,9 @@ public class ImageService {
     @Autowired
     ImageRepository imageRepository;
 
+
+    @Autowired
+    ProductService productService;
     @Autowired
     private AmazonS3 amazonS3;
 
@@ -43,7 +50,7 @@ public class ImageService {
     }
 
 
-    public List<ImageVO> getImageById(Long imageId) {
+    public List<ImageVO> getImageById(String imageId) {
         List<ImageVO> image = imageRepository.getImageById(imageId);
         if(image == null || image.size() == 0){
             throw new ImageNotFoundException(ErrorMessage.IMAGE_NOT_FOUND);
@@ -51,7 +58,7 @@ public class ImageService {
         return image;
     }
 
-    public void DeleteImageById(Long imageId) {
+    public void DeleteImageById(String imageId) {
         List<ImageVO> imageVO = getImageById(imageId);
         checkAuth(imageVO.get(0));
         imageRepository.deleteById(imageId);
@@ -63,7 +70,10 @@ public class ImageService {
     }
 
     public ImageVO createImage(Long productId, MultipartFile file) throws Exception {
+        // if product not exists, throw product not exists exception
+        Product product = productService.getProduct(productId);
 
+        //
         byte[] imageData = file.getBytes();
         String fileName = file.getOriginalFilename();
         String s3BucketPath = "images/user:" + UserHolder.getUser().getId()
@@ -82,7 +92,10 @@ public class ImageService {
         Image image = new Image();
         image.setFileName(fileName);
         image.setS3BucketPath(url);
+        image.setUser(UserHolder.getUser());
+        image.setProduct(product);
         imageRepository.save(image);
+
         return null;
     }
 }

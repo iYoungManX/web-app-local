@@ -19,7 +19,7 @@ public class Image {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long imageId;
+    private String imageId;
     private String fileName;
 
     @CreatedDate
@@ -36,5 +36,4 @@ public class Image {
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
-
 }

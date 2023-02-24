@@ -18,7 +18,7 @@ import java.util.Date;
 @NoArgsConstructor
 public class ImageVO {
     @JsonProperty("image_id")
-    private Long imageId;
+    private String imageId;
 
     @JsonProperty("user_id")
     private Long userId;
