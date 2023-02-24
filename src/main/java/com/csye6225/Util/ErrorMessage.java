@@ -10,7 +10,7 @@ public class ErrorMessage {
 
     public static final String INVALID_EMAIL = "Invalid email";
 
-    public static final String CHANGE_OTHER_INFORMATION = "Unauthorized, Cannot change other information";
+    public static final String CHANGE_OTHER_INFORMATION = "Unauthorized, Cannot change or delete other information";
 
     public static final String GET_OTHER_INFORMATION = "Unauthorized, Cannot get other information";
     // Product related
@@ -23,5 +23,7 @@ public class ErrorMessage {
     public static final String NO_CONTENT ="Please enter all the necessary fields";
 
     public static final String PARSE_ERROR = "Can't parse the input";
+
+    public static final String IMAGE_NOT_FOUND = "Image not found";
 
 }

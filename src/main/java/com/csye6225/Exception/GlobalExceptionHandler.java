@@ -1,6 +1,7 @@
 package com.csye6225.Exception;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.csye6225.Exception.ImageException.ImageNotFoundException;
 import com.csye6225.Exception.ProductException.CreateOrUpdateProductException;
 import com.csye6225.Exception.ProductException.NoContentException;
 import com.csye6225.Exception.ProductException.ProductNotExistException;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+
 
     @ExceptionHandler(RepeatEmailException.class)
     public ResponseEntity<String> handleRepeatEmailException(RepeatEmailException e) {
@@ -75,5 +78,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(ErrorMessage.PARSE_ERROR);
     }
 
+    @ExceptionHandler(ImageNotFoundException.class)
+    public ResponseEntity<String> handleImageNotFoundException(ImageNotFoundException e){
+        return ResponseEntity.status(404).body(e.getMessage());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleException(Exception e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
 }
 

@@ -3,8 +3,8 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://mysqldb:3306/csye6225db?createDatabaseIfNotExist=true
-#    url: jdbc:mysql://localhost:3306/csye6225db?createDatabaseIfNotExist=true
+#    url: jdbc:mysql://mysqldb:3306/csye6225db?createDatabaseIfNotExist=true
+    url: jdbc:mysql://localhost:3306/csye6225db?createDatabaseIfNotExist=true
     username: root
     password: root
     hikari:
@@ -12,9 +12,13 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
 server:
   port: 8080
+
+
+bucket:
+  name: csye6225-hw5
 
 
 

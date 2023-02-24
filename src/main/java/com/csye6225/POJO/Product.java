@@ -1,5 +1,6 @@
 package com.csye6225.POJO;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -9,7 +10,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
-
+import java.util.List;
 
 
 @Data
@@ -35,4 +36,9 @@ public class Product {
     private Date dateLastUpdated;
     @JsonProperty("owner_userid")
     private Long ownerUserId;
+
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name="product_id")
+    private List<Image> images;
 }
