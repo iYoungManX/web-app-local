@@ -37,8 +37,7 @@ public class ImageService {
     @Autowired
     private AmazonS3 amazonS3;
 
-    @Value("${bucket.name}")
-    private String bucketName;
+    private String bucketName = System.getenv("BUCKET_NAME");
 
 
     public List<Image> getAllImagesbyProductId(Long productId) {

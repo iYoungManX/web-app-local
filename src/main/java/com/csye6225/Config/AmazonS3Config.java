@@ -13,8 +13,6 @@ import java.util.Map;
 @Configuration
 public class AmazonS3Config {
 
-    Map<String, String> env = System.getenv();
-
     private final String accessKey = System.getenv("AWS_ACCESS_KEY_ID");
     private final String secretKey = System.getenv("AWS_SECRET_ACCESS_KEY");
     private String region = "us-west-2";

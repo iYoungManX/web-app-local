@@ -21,7 +21,9 @@ import java.util.Date;
 public class Image {
 
     @Id
+    @JsonProperty("image_id")
     private String imageId;
+    @JsonProperty("file_name")
     private String fileName;
 
     @CreatedDate
@@ -29,7 +31,7 @@ public class Image {
     @JsonProperty("date_created")
     private Date dateCreated;
 
-
+    @JsonProperty("s3_bucket_path")
     @Column(name = "s3_bucket_path")
     private String s3BucketPath;
 
@@ -45,6 +47,8 @@ public class Image {
     @JoinColumn(name = "product_id")
     private Product product;
 
+
+    @JsonProperty("user_id")
     public Long getUserId(){
         return user.getId();
     }
