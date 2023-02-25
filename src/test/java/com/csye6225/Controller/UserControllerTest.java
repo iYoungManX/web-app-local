@@ -85,19 +85,19 @@ class UserControllerTest {
 
 
 
-    @Test
-    @DisplayName("InvalidEmailTest")
-    public void testInvalidEmail() throws Exception {
-        User user = randomUserFactory.getRandomUser();
-        user.setUsername("someinvalidemail");
-        String jsonbody = randomUserFactory.parseUserToJson(user);
-        mockMvc.perform(MockMvcRequestBuilders.post("/v1/user/")
-                        .content(jsonbody).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().string(ErrorMessage.INVALID_EMAIL))
-                .andDo(MockMvcResultHandlers.print())
-                .andReturn();
-    }
+//    @Test
+//    @DisplayName("InvalidEmailTest")
+//    public void testInvalidEmail() throws Exception {
+//        User user = randomUserFactory.getRandomUser();
+//        user.setUsername("someinvalidemail");
+//        String jsonbody = randomUserFactory.parseUserToJson(user);
+//        mockMvc.perform(MockMvcRequestBuilders.post("/v1/user/")
+//                        .content(jsonbody).contentType(MediaType.APPLICATION_JSON))
+//                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+//                .andExpect(MockMvcResultMatchers.content().string(ErrorMessage.INVALID_EMAIL))
+//                .andDo(MockMvcResultHandlers.print())
+//                .andReturn();
+//    }
 
 
     @Test

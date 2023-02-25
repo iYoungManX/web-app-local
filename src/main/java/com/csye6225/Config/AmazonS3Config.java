@@ -15,7 +15,7 @@ public class AmazonS3Config {
 
     private final String accessKey = System.getenv("AWS_ACCESS_KEY_ID");
     private final String secretKey = System.getenv("AWS_SECRET_ACCESS_KEY");
-    private String region = "us-west-2";
+    private String region = System.getenv("REGION");
 
     @Bean
     public AmazonS3 amazonS3() {

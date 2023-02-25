@@ -48,8 +48,14 @@ public class Image {
     private Product product;
 
 
-    @JsonProperty("user_id")
-    public Long getUserId(){
-        return user.getId();
+//    @JsonProperty("user_id")
+//    public Long getUserId(){
+//        return user.getId();
+//    }
+
+
+    @JsonProperty("product_id")
+    public Long getProductId(){
+        return product.getId();
     }
 }

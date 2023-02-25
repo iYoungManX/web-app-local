@@ -8,6 +8,11 @@ sudo yum install expect -y
 sudo amazon-linux-extras enable corretto8
 sudo yum install -y java-17-amazon-corretto-devel
 
+# Install MySQL
+sudo yum install -y mariadb-server
+sudo systemctl start mariadb
+sudo systemctl enable mariadb
+
 
 sudo mkdir /opt/deployment
 sudo chown -R $USER:$USER /opt/deployment

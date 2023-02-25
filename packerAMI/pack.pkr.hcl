@@ -32,8 +32,8 @@ source "amazon-ebs" "ami" {
   instance_type   = "t2.micro"
   region          = var.aws_region
   source_ami      = var.source_ami
-  access_key    = var.aws_access_key
-  secret_key    = var.aws_secret_key
+  access_key      = var.aws_access_key
+  secret_key      = var.aws_secret_key
   ssh_username    = var.ssh_username
   ami_users = ["050297369388","435646449189"]
 

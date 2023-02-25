@@ -1,19 +1,19 @@
 
-
-
 module "us-west-2-vpc1" {
-  region              = "us-west-2"
-  profile             = var.profile
-  source              = "./Modules"
-  vpc-cidr            = "10.0.0.0/16"
-  vpc-tag             = "us-west-2-vpc1"
-  public_subnets_num  = 3
-  private_subnets_num = 3
-  availability_zones  = ["us-west-2a", "us-west-2b", "us-west-2c"]
-  ami-id              = "ami-002572e24df004c63"
-  db-username         = "csye6225"
-  db-password         = "wuadhwadh2932rb3dn"
-  db-name             = "csye6225"
+  region                = "us-west-2"
+  profile               = var.profile
+  source                = "./Modules"
+  vpc-cidr              = "10.0.0.0/16"
+  vpc-tag               = "us-west-2-vpc1"
+  public_subnets_num    = 3
+  private_subnets_num   = 3
+  availability_zones    = ["us-west-2a", "us-west-2b", "us-west-2c"]
+  ami-id                = "ami-03688ace860100ab8"
+  db-username           = "csye6225"
+  db-password           = "wu390u3j3b3dn"
+  db-name               = "csye6225"
+  aws_access_key        = var.aws_access_key
+  aws_secret_access_key = var.aws_secret_access_key
 }
 
 
