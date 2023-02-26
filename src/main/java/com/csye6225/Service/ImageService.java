@@ -6,20 +6,18 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.csye6225.Exception.ImageException.ImageNotFoundException;
 import com.csye6225.Exception.UserException.ChangeOthersInfoException;
+import com.csye6225.Exception.UserException.GetOthersInfoException;
 import com.csye6225.POJO.Image;
 import com.csye6225.POJO.Product;
 import com.csye6225.Repository.ImageRepository;
 import com.csye6225.Util.ErrorMessage;
 import com.csye6225.Util.UserHolder;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -37,28 +35,31 @@ public class ImageService {
     @Autowired
     private AmazonS3 amazonS3;
 
-    private String bucketName = System.getenv("BUCKET_NAME");
+    private final String bucketName = System.getenv("BUCKET_NAME");
+//    private String bucketName ="yao-zo";
 
 
     public List<Image> getAllImagesbyProductId(Long productId) {
+        Product product = productService.getProduct(productId);
+        if (!Objects.equals(product.getOwnerUserId(), UserHolder.getUser().getId())){
+            throw new GetOthersInfoException(ErrorMessage.GET_OTHER_INFORMATION);
+        }
         return imageRepository.findByProductId(productId);
     }
 
 
-    public List<Image> getImageById(String imageId) {
+    public List<Image> getImageById(Long productId, String imageId) {
         List<Image> image = imageRepository.findByImageId(imageId);
-        if(image == null || image.size() == 0){
+        checkAuth(image.get(0), productId);
+        if(image.size() == 0){
             throw new ImageNotFoundException(ErrorMessage.IMAGE_NOT_FOUND);
         }
         return image;
     }
 
-    public void DeleteImageById(String imageId) {
-        Image image = getImageById(imageId).get(0);
-        checkAuth(image);
-
+    public void DeleteImageById(Long productId, String imageId) {
+        Image image = getImageById(productId, imageId).get(0);
         // delete the image from amazon s3
-        Long productId = image.getProduct().getId();
         String fileName = image.getFileName();
         String s3BucketPath = "images/user-" + UserHolder.getUser().getId()
                 + "/product-" + productId + "/"  + fileName;
@@ -67,8 +68,12 @@ public class ImageService {
        //  delete from the database
         imageRepository.deleteById(imageId);
     }
-    private void checkAuth(Image image) {
-        if(!Objects.equals(image.getUserId(), UserHolder.getUser().getId())){
+    private void checkAuth(Image image, Long productId) {
+        if(!Objects.equals(image.getUser().getId(), UserHolder.getUser().getId())){
+            throw new ChangeOthersInfoException(ErrorMessage.CHANGE_OTHER_INFORMATION);
+        }
+
+        if(!Objects.equals(image.getProduct().getId(), productId)){
             throw new ChangeOthersInfoException(ErrorMessage.CHANGE_OTHER_INFORMATION);
         }
     }
@@ -76,7 +81,9 @@ public class ImageService {
     public Image createImage(Long productId, MultipartFile file) {
         // if product not exists, throw product not exists exception
         Product product = productService.getProduct(productId);
-
+        if (!Objects.equals(product.getOwnerUserId(), UserHolder.getUser().getId())){
+            throw new ChangeOthersInfoException(ErrorMessage.CHANGE_OTHER_INFORMATION);
+        }
         // upload image to S3
         String url = null;
         try {
@@ -94,7 +101,7 @@ public class ImageService {
         image.setUser(UserHolder.getUser());
         image.setProduct(product);
         imageRepository.save(image);
-        return getImageById(image.getImageId()).get(0);
+        return getImageById(productId, image.getImageId()).get(0);
     }
 
     private String uploadImageToS3( Long productId, MultipartFile file) throws Exception {

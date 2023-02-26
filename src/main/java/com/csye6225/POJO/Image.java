@@ -53,9 +53,8 @@ public class Image {
 //        return user.getId();
 //    }
 
-
     @JsonProperty("product_id")
-    public Long getProductId(){
+    public Long getProId(){
         return product.getId();
     }
 }

@@ -66,16 +66,6 @@ variable "db-password" {
 }
 
 
-variable "aws_access_key" {
-  default = "324csef"
-}
-
-
-variable "aws_secret_access_key" {
-  default = "deadejnlf"
-#  default = printenv("AWS_ACCESS_KEY")
-}
-
 
 
 

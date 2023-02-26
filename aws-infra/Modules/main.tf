@@ -131,7 +131,7 @@ resource "aws_security_group" "ec2-security-group" {
 
 resource "aws_db_subnet_group" "rds_instance_subnet_group" {
   name = "rds_instance_subnet_group"
-  subnet_ids = [aws_subnet.private[0].id]
+  subnet_ids = [aws_subnet.private[0].id,aws_subnet.private[1].id]
 }
 
 resource "aws_db_parameter_group" "mysql" {
@@ -176,7 +176,6 @@ resource "aws_db_instance" "rds_instance" {
   multi_az             = false
   publicly_accessible  = false
   db_name              = var.db-name
-  availability_zone = var.availability_zones[0]
   db_subnet_group_name = aws_db_subnet_group.rds_instance_subnet_group.name
   vpc_security_group_ids = [aws_security_group.rds_security-group.id]
   parameter_group_name = aws_db_parameter_group.mysql.name
@@ -226,46 +225,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "private_bucket_lifecycle" {
   }
   bucket = aws_s3_bucket.private_bucket.id
 }
-
-
-
-
-
-
-
-#resource "aws_s3_bucket_policy" "private_bucket_policy" {
-#  bucket = aws_s3_bucket.private_bucket.id
-#
-#  policy = jsonencode({
-#    Version = "2012-10-17"
-#    Statement = [
-#      {
-#        Sid = "DenyUnEncryptedObjectUploads"
-#        Effect = "Deny"
-#        Principal = "*"
-#        Action = "s3:PutObject"
-#        Resource = "${aws_s3_bucket.private_bucket.arn}/*"
-#        Condition = {
-#          StringNotEquals = {
-#            "s3:x-amz-server-side-encryption": "AES256"
-#          }
-#        }
-#      },
-#      {
-#        Sid = "DenyPublicAccess"
-#        Effect = "Deny"
-#        Principal = "*"
-#        Action = "s3:*"
-#        Resource = "${aws_s3_bucket.private_bucket.arn}/*"
-#        Condition = {
-#          Bool = {
-#            "aws:SecureTransport": false
-#          }
-#        }
-#      }
-#    ]
-#  })
-#}
 
 
 
@@ -352,17 +311,21 @@ resource "aws_instance" "ec2-instance" {
       echo "export DB_USERNAME=${var.db-username}">> /etc/bashrc
       echo "export BUCKET_NAME=${aws_s3_bucket.private_bucket.bucket}">> /etc/bashrc
       echo "export REGION=${var.region}">> /etc/bashrc
-      echo "export AWS_ACCESS_KEY_ID=${var.aws_access_key}">> /etc/bashrc
-      echo "export AWS_SECRET_ACCESS_KEY=${var.aws_secret_access_key}">> /etc/bashrc
       source /etc/bashrc
+      sudo chmod +x /opt/launch.sh
       cd /opt/deployment/ && java -jar app.jar
     EOF
 }
-
+#sudo cp /opt/launch.sh /etc/profile.d/launch.sh
+#cd /opt/deployment/ && java -jar app.jar
+#echo "export AWS_ACCESS_KEY_ID=${var.aws_access_key}">> /etc/bashrc
+#echo "export AWS_SECRET_ACCESS_KEY=${var.aws_secret_access_key}">> /etc/bashrc
 
 output "public_ip" {
   value = aws_instance.ec2-instance.public_ip
 }
+
+
 
 
 

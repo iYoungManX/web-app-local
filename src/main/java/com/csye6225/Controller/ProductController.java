@@ -65,12 +65,12 @@ public class ProductController {
 
     @GetMapping("/{productId}/image/{imageId}")
     public List<Image> getImage(@PathVariable Long productId, @PathVariable String imageId){
-        return imageService.getImageById(imageId);
+        return imageService.getImageById(productId,imageId);
     }
 
     @DeleteMapping("/{productId}/image/{imageId}")
     public void deleteImage(@PathVariable Long productId, @PathVariable String imageId){
-        imageService.DeleteImageById(imageId);
+        imageService.DeleteImageById(productId,imageId);
     }
 
 

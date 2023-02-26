@@ -1,4 +1,6 @@
 #!/bin/bash
+#while [ -z "$DB_HOST" ]; do
+#  sleep 1
+#done
 
-sudo systemctl restart mariadb
-sudo systemctl restart myapp
+cd /opt/deployment/ && java -jar app.jar > a.txt

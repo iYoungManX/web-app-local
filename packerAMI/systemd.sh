@@ -7,6 +7,7 @@ sudo tee /etc/systemd/system/myapp.service > /dev/null <<EOT
 Description=Manage Java service
 
 [Service]
+Environment=MY_VAR=$EXISTING_VAR
 WorkingDirectory=/opt/deployment
 ExecStart=/bin/java -Xms128m -Xmx256m -jar app.jar
 User=jvmapps
@@ -21,5 +22,5 @@ EOT
 sudo chown -R jvmapps:appmgr /opt/deployment
 
 sudo systemctl daemon-reload
-sudo systemctl start myapp.service
+sudo systemctl start myapp
 sudo systemctl enable myapp

@@ -58,7 +58,13 @@ build {
     destination = "/opt/deployment/app.jar"
   }
 
-  provisioner "shell" {
-    script = "systemd.sh"
+  provisioner "file" {
+    source = "launch.sh"
+    destination= "/opt/launch.sh"
   }
+
+#  provisioner "shell" {
+#    script = "systemd.sh"
+#  }
+
 }
