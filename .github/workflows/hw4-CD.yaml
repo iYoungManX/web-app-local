@@ -12,6 +12,10 @@ name: HW-4 CD
 #    branches:
 #      - main
 #    types: [closed]
+on:
+  push:
+    branches:
+      - xxx
 
 jobs:
   build-image:

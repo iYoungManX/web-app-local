@@ -32,7 +32,7 @@ jobs:
 
       - name: CI
         run:
-          mvn test
+          mvn test package
 
       - name: packer validate
         run:
