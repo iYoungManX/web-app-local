@@ -16,7 +16,7 @@ on:
       - main
 
 jobs:
-  hw4-CI:
+  hw5-CI:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
