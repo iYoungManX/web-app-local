@@ -6,12 +6,12 @@
 # separate terms of service, privacy policy, and support
 
 
-name: HW-4 CD
-#on:
-#  pull_request:
-#    branches:
-#      - main
-#    types: [closed]
+name: HW-5 CD
+on:
+  pull_request:
+    branches:
+      - main
+    types: [closed]
 
 jobs:
   build-image:
@@ -40,6 +40,6 @@ jobs:
           version: "1.8.3" # or `latest`
 
       - name: Run packer build
-        run: cd packer && packer build pack.pkr.hcl
+        run: cd packerAMI && packer build pack.pkr.hcl
 
 
