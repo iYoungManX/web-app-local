@@ -15,7 +15,6 @@ sudo systemctl enable mariadb
 
 
 sudo mkdir /opt/deployment
-#sudo chown -R $USER:$USER /opt/deployment
-sudo chmod -R 777 /opt
-sudo chmod -R 777 /opt/deployment
+sudo chown -R $USER:$USER /opt/deployment
+
 

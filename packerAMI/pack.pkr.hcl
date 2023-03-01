@@ -47,24 +47,15 @@ source "amazon-ebs" "ami" {
 
 build {
   sources = ["source.amazon-ebs.ami"]
-
-
   provisioner "shell" {
     script = "setup.sh"
   }
-
   provisioner "file" {
     source      = "../target/CSYE6225-0.0.1-SNAPSHOT.jar"
     destination = "/opt/deployment/app.jar"
   }
-
-  provisioner "file" {
-    source = "launch.sh"
-    destination= "/opt/launch.sh"
+  provisioner "shell" {
+    script = "systemd.sh"
   }
-
-#  provisioner "shell" {
-#    script = "systemd.sh"
-#  }
 
 }

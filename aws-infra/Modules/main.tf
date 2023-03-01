@@ -186,13 +186,11 @@ resource "aws_db_instance" "rds_instance" {
 
 
 
-resource "random_pet" "bucket_name" {
-  length = 4
-}
+resource "random_uuid" "main" {}
 
 
 resource "aws_s3_bucket" "private_bucket" {
-  bucket = "bucket-${random_pet.bucket_name.id}"
+  bucket = "bucket-${random_uuid.main.result}"
   force_destroy = true
 }
 
@@ -288,7 +286,7 @@ resource "aws_instance" "ec2-instance" {
   ami = var.ami-id # Replace with your custom AMI ID
   instance_type = "t2.micro"
   key_name = "yao"
-  subnet_id = aws_subnet.public[1].id
+  subnet_id = aws_subnet.public[0].id
   vpc_security_group_ids = [aws_security_group.ec2-security-group.id]
   associate_public_ip_address = true
   iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
@@ -311,15 +309,11 @@ resource "aws_instance" "ec2-instance" {
       echo "export DB_USERNAME=${var.db-username}">> /etc/bashrc
       echo "export BUCKET_NAME=${aws_s3_bucket.private_bucket.bucket}">> /etc/bashrc
       echo "export REGION=${var.region}">> /etc/bashrc
-      source /etc/bashrc
-      sudo chmod +x /opt/launch.sh
-      cd /opt/deployment/ && java -jar app.jar
+      sudo systemctl daemon-reload
+      sudo systemctl start myapp.service
+      sudo systemctl enable myapp
     EOF
 }
-#sudo cp /opt/launch.sh /etc/profile.d/launch.sh
-#cd /opt/deployment/ && java -jar app.jar
-#echo "export AWS_ACCESS_KEY_ID=${var.aws_access_key}">> /etc/bashrc
-#echo "export AWS_SECRET_ACCESS_KEY=${var.aws_secret_access_key}">> /etc/bashrc
 
 output "public_ip" {
   value = aws_instance.ec2-instance.public_ip
