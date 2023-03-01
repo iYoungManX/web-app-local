@@ -3,21 +3,21 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://mysqldb:3306/csye6225db?createDatabaseIfNotExist=true
-#    url: jdbc:mysql://localhost:3306/csye6225db?createDatabaseIfNotExist=true
-    username: root
-    password: root
+#    url: jdbc:mysql://mysqldb:3306/csye6225db?createDatabaseIfNotExist=true
+#    url: jdbc:mysql://${DB_HOST:localhost}:3306/${DB_NAME:csye6225db}?createDatabaseIfNotExist=true
+    url: jdbc:mysql://${DB_HOST}/${DB_NAME:csye6225db}?createDatabaseIfNotExist=true
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
     hikari:
       initialization-fail-timeout: 10000
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
 server:
   port: 8080
 
 
-  ###yao
 
 
 

@@ -16,10 +16,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Data
 @Entity
@@ -47,6 +44,12 @@ public class User implements UserDetails {
     @JsonProperty("account_updated")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date accountUpdated;
+
+//    @OneToMany(cascade = CascadeType.ALL)
+//    @JoinColumn(name="user_id")
+//    private List<Image> images;
+
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

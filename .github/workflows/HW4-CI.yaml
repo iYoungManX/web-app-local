@@ -11,9 +11,9 @@ on:
   push:
     branches:
       - hw4
-  pull_request:
-    branches:
-      - main
+#  pull_request:
+#    branches:
+#      - main
 
 jobs:
   hw4-CI:

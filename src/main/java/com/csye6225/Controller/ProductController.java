@@ -1,10 +1,15 @@
 package com.csye6225.Controller;
 
+import com.csye6225.POJO.Image;
 import com.csye6225.POJO.Product;
+import com.csye6225.Service.ImageService;
 import com.csye6225.Service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/v1/product")
@@ -12,6 +17,10 @@ public class ProductController {
 
     @Autowired
     ProductService productService;
+
+
+    @Autowired
+    ImageService imageService;
 
     @GetMapping("/{productId}")
     public Product getProduct(@PathVariable Long productId) {
@@ -41,4 +50,28 @@ public class ProductController {
         productService.deleteProduct(productId);
         return "Deleted successfully";
     }
+
+
+    @GetMapping("/{productId}/image")
+    public List<Image> getAllImages(@PathVariable Long productId){
+        return imageService.getAllImagesbyProductId(productId);
+    }
+
+    @PostMapping("/{productId}/image")
+    public Image createImage(@PathVariable Long productId,@RequestParam("file") MultipartFile file) throws Exception {
+        return imageService.createImage(productId,file);
+    }
+
+
+    @GetMapping("/{productId}/image/{imageId}")
+    public List<Image> getImage(@PathVariable Long productId, @PathVariable String imageId){
+        return imageService.getImageById(productId,imageId);
+    }
+
+    @DeleteMapping("/{productId}/image/{imageId}")
+    public void deleteImage(@PathVariable Long productId, @PathVariable String imageId){
+        imageService.DeleteImageById(productId,imageId);
+    }
+
+
 }

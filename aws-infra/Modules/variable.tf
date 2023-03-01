@@ -50,6 +50,25 @@ variable "ami-id" {
 }
 
 
+variable "db-username" {
+  default = "root"
+  type= string
+}
+
+variable "db-name" {
+  default = "csye6225"
+  type= string
+}
+
+variable "db-password" {
+  default = "youneverknowman123"
+  type= string
+}
+
+
+
+
+
 
 
 
