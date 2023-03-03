@@ -12,6 +12,10 @@ module "us-west-2-vpc1" {
   db-username           = "csye6225"
   db-password           = "wu390u3j3b3dn"
   db-name               = "csye6225"
+  domain                = "prod.iyoungman.me"
+  demo-zone-id          = "Z0930698KXRU4BE9XNRX"
+  root-zone-id          = "Z091841033OWE1690O59W"
+  dev-zone-id           = "Z00200802VX2E58CJXHXO"
 }
 
 

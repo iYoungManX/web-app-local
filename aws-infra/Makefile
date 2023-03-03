@@ -7,11 +7,17 @@ dev-plan:
 demo-plan:
 	terraform plan -var-file demo.tfvars
 
+root-plan:
+	terraform plan -var-file root.tfvars
+
 dev-apply:
 	terraform apply -var-file dev.tfvars
 
 demo-apply:
 	terraform apply -var-file demo.tfvars
+
+root-apply:
+	terraform apply -var-file root.tfvars
 
 dev-destroy:
 	terraform destroy -var-file dev.tfvars
@@ -19,6 +25,9 @@ dev-destroy:
 demo-destroy:
 	terraform destroy -var-file demo.tfvars
 
+
+root-destroy:
+	terraform destroy -var-file root.tfvars
 format:
 	terraform fmt
 

@@ -1,8 +1,21 @@
 
 provider "aws" {
+#  alias = "demo"
   region  = var.region
   profile = var.profile
   # credentials = "~/.aws/credentials"
+}
+
+provider "aws" {
+  alias = "dev"
+  region = var.region
+  profile = "iYoungManDEV-IAMuser"
+}
+
+provider "aws" {
+  alias = "root"
+  region = var.region
+  profile = "root"
 }
 
 # Create VPC
@@ -319,6 +332,49 @@ output "public_ip" {
   value = aws_instance.ec2-instance.public_ip
 }
 
+#resource "aws_route53_zone" "domain" {
+#  name = var.domain
+#}
+
+// demo
+resource "aws_route53_record" "record" {
+  name = var.domain
+  zone_id = var.demo-zone-id
+  type = "A"
+  ttl = 300
+  records = [aws_instance.ec2-instance.public_ip]
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+// root
+resource "aws_route53_record" "record-root" {
+  provider = aws.root
+  name = ""
+  zone_id = var.root-zone-id
+  type = "A"
+  ttl = 300
+  records = [aws_instance.ec2-instance.public_ip]
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+// dev
+resource "aws_route53_record" "record-dev" {
+  provider = aws.dev
+  name = ""
+  zone_id = var.dev-zone-id
+  type = "A"
+  ttl = 300
+  records = [aws_instance.ec2-instance.public_ip]
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
 
 
 
