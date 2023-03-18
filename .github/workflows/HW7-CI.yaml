@@ -5,15 +5,15 @@
 # They are provided by a third-party and are governed by
 # separate terms of service, privacy policy, and support
 # documentation.
-name: HW-5 CI
+name: HW-7 CI
 
 on:
   push:
     branches:
-      - hw5
-#  pull_request:
-#    branches:
-#      - main
+      - hw7
+  pull_request:
+    branches:
+      - main
 
 jobs:
   hw5-CI:
