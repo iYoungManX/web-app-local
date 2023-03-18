@@ -3,11 +3,13 @@ package com.csye6225.Controller;
 import com.csye6225.Exception.UserException.GetOthersInfoException;
 import com.csye6225.Exception.UserException.InvalidUpdateException;
 import com.csye6225.Util.ErrorMessage;
+import com.csye6225.Util.Metrics;
 import com.csye6225.Util.UserHolder;
 import com.csye6225.VO.UserVO;
 import com.csye6225.Exception.UserException.ChangeOthersInfoException;
 import com.csye6225.POJO.User;
 import com.csye6225.Service.UserService;
+import com.timgroup.statsd.StatsDClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,10 +20,13 @@ public class UserController {
     @Autowired
     UserService userService;
 
+    @Autowired
+    StatsDClient statsDClient;
+
 
     @GetMapping("/{id}")
     public UserVO getUser(@PathVariable Long id) {
-
+        statsDClient.incrementCounter(Metrics.GET_USER);
         User unAuthUser = UserHolder.getUser();
         if(!unAuthUser.getId().equals(id)){
             throw new GetOthersInfoException(ErrorMessage.GET_OTHER_INFORMATION);
@@ -33,12 +38,13 @@ public class UserController {
 
     @PostMapping("/")
     public UserVO createUser(@RequestBody User user) {
+        statsDClient.incrementCounter(Metrics.CREATE_USER);
         return userService.createUser(user);
     }
 
     @PutMapping ("/{id}")
     public ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody User user) {
-
+        statsDClient.incrementCounter(Metrics.UPDATE_USER);
         User unAuthUser = UserHolder.getUser();
         if(!unAuthUser.getId().equals(id)){
             throw new ChangeOthersInfoException(ErrorMessage.CHANGE_OTHER_INFORMATION);

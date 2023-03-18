@@ -54,6 +54,11 @@ build {
     source      = "../target/CSYE6225-0.0.1-SNAPSHOT.jar"
     destination = "/opt/deployment/app.jar"
   }
+
+  provisioner "file" {
+    source      = "cloudwatch-config.json"
+    destination = "/opt/deployment/cloudwatch-config.json"
+  }
   provisioner "shell" {
     script = "systemd.sh"
   }

@@ -13,7 +13,10 @@ sudo yum install -y mariadb-server
 sudo systemctl start mariadb
 sudo systemctl enable mariadb
 
+## install cloudwatch agent
+sudo yum install amazon-cloudwatch-agent -y
 
+##
 sudo mkdir /opt/deployment
 sudo chown -R $USER:$USER /opt/deployment
 
