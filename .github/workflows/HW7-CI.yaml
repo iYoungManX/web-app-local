@@ -16,7 +16,7 @@ on:
       - main
 
 jobs:
-  hw5-CI:
+  hw7-CI:
     runs-on: ubuntu-latest
     env:
       REGION: ${{ secrets.REGION }}
