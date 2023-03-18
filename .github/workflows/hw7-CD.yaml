@@ -4,22 +4,25 @@
 # This workflow uses actions that are not certified by GitHub.
 # They are provided by a third-party and are governed by
 # separate terms of service, privacy policy, and support
-# documentation.
-name: HW-5 CI
 
+
+name: HW-7 CD
 on:
-  push:
+  pull_request:
     branches:
-      - hw5
-#  pull_request:
-#    branches:
-#      - main
+      - main
+    types: [closed]
 
 jobs:
-  hw5-CI:
+  build-image:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+
     env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       REGION: ${{ secrets.REGION }}
+
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 17
@@ -28,12 +31,17 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
-
-
-      - name: CI
+      - name: Build with Maven
         run:
-          mvn test package
+          mvn package
 
-      - name: packer validate
-        run:
-          cd packerAMI && packer validate pack.pkr.hcl
+      - name: Setup `packer`
+        uses: hashicorp/setup-packer@main
+        id: setup
+        with:
+          version: "1.8.3" # or `latest`
+
+      - name: Run packer build
+        run: cd packerAMI && packer build pack.pkr.hcl
+
+

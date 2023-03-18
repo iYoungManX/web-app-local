@@ -7,11 +7,15 @@
 
 
 name: HW-5 CD
+#on:
+#  pull_request:
+#    branches:
+#      - main
+#    types: [closed]
 on:
-  pull_request:
+  push:
     branches:
-      - main
-    types: [closed]
+      - xxx
 
 jobs:
   build-image:

@@ -1,8 +1,21 @@
 
 provider "aws" {
+#  alias = "demo"
   region  = var.region
   profile = var.profile
   # credentials = "~/.aws/credentials"
+}
+
+provider "aws" {
+  alias = "dev"
+  region = var.region
+  profile = "iYoungManDEV-IAMuser"
+}
+
+provider "aws" {
+  alias = "root"
+  region = var.region
+  profile = "root"
 }
 
 # Create VPC
@@ -274,6 +287,14 @@ resource "aws_iam_role_policy_attachment" "webapp_s3_attachment" {
 }
 
 
+
+resource "aws_iam_role_policy_attachment" "ec2_cloudwatch_attachment" {
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+  role       = aws_iam_role.ec2_EC2-CSYE6225role.name
+}
+
+
+
 resource "aws_iam_instance_profile" "ec2_profile" {
   name = "EC2-CSYE6225-profile"
   role = aws_iam_role.ec2_EC2-CSYE6225role.name
@@ -286,7 +307,7 @@ resource "aws_instance" "ec2-instance" {
   ami = var.ami-id # Replace with your custom AMI ID
   instance_type = "t2.micro"
   key_name = "yao"
-  subnet_id = aws_subnet.public[0].id
+  subnet_id = aws_subnet.public[1].id
   vpc_security_group_ids = [aws_security_group.ec2-security-group.id]
   associate_public_ip_address = true
   iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
@@ -301,17 +322,18 @@ resource "aws_instance" "ec2-instance" {
 
   user_data = <<-EOF
       #!/bin/bash
-      sudo chmod -v 777 /etc/bashrc
+      sudo chmod -v 777 /etc/environment
       # Set environment variables for the application
-      echo "export DB_PASSWORD=${var.db-password}">> /etc/bashrc
-      echo "export DB_HOST=${aws_db_instance.rds_instance.endpoint}">> /etc/bashrc
-      echo "export DB_NAME=${var.db-name}">> /etc/bashrc
-      echo "export DB_USERNAME=${var.db-username}">> /etc/bashrc
-      echo "export BUCKET_NAME=${aws_s3_bucket.private_bucket.bucket}">> /etc/bashrc
-      echo "export REGION=${var.region}">> /etc/bashrc
+      echo "export DB_PASSWORD=${var.db-password}">> /etc/environment
+      echo "export DB_HOST=${aws_db_instance.rds_instance.endpoint}">> /etc/environment
+      echo "export DB_NAME=${var.db-name}">> /etc/environment
+      echo "export DB_USERNAME=${var.db-username}">> /etc/environment
+      echo "export BUCKET_NAME=${aws_s3_bucket.private_bucket.bucket}">> /etc/environment
+      echo "export REGION=${var.region}">> /etc/environment
       sudo systemctl daemon-reload
       sudo systemctl start myapp.service
       sudo systemctl enable myapp
+      sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/deployment/cloudwatch-config.json -s
     EOF
 }
 
@@ -319,6 +341,49 @@ output "public_ip" {
   value = aws_instance.ec2-instance.public_ip
 }
 
+#resource "aws_route53_zone" "domain" {
+#  name = var.domain
+#}
+
+// demo
+resource "aws_route53_record" "record" {
+  name = var.domain
+  zone_id = var.demo-zone-id
+  type = "A"
+  ttl = 300
+  records = [aws_instance.ec2-instance.public_ip]
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+// root
+resource "aws_route53_record" "record-root" {
+  provider = aws.root
+  name = ""
+  zone_id = var.root-zone-id
+  type = "A"
+  ttl = 300
+  records = [aws_instance.ec2-instance.public_ip]
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+// dev
+resource "aws_route53_record" "record-dev" {
+  provider = aws.dev
+  name = ""
+  zone_id = var.dev-zone-id
+  type = "A"
+  ttl = 300
+  records = [aws_instance.ec2-instance.public_ip]
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
 
 
 
