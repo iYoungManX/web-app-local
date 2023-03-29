@@ -307,7 +307,7 @@ resource "aws_instance" "ec2-instance" {
   ami = var.ami-id # Replace with your custom AMI ID
   instance_type = "t2.micro"
   key_name = "yao"
-  subnet_id = aws_subnet.public[1].id
+  subnet_id = aws_subnet.public[0].id
   vpc_security_group_ids = [aws_security_group.ec2-security-group.id]
   associate_public_ip_address = true
   iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
@@ -324,12 +324,12 @@ resource "aws_instance" "ec2-instance" {
       #!/bin/bash
       sudo chmod -v 777 /etc/environment
       # Set environment variables for the application
-      echo "export DB_PASSWORD=${var.db-password}">> /etc/environment
-      echo "export DB_HOST=${aws_db_instance.rds_instance.endpoint}">> /etc/environment
-      echo "export DB_NAME=${var.db-name}">> /etc/environment
-      echo "export DB_USERNAME=${var.db-username}">> /etc/environment
-      echo "export BUCKET_NAME=${aws_s3_bucket.private_bucket.bucket}">> /etc/environment
-      echo "export REGION=${var.region}">> /etc/environment
+      echo "DB_PASSWORD=${var.db-password}">> /etc/environment
+      echo "DB_HOST=${aws_db_instance.rds_instance.endpoint}">> /etc/environment
+      echo "DB_NAME=${var.db-name}">> /etc/environment
+      echo "DB_USERNAME=${var.db-username}">> /etc/environment
+      echo "BUCKET_NAME=${aws_s3_bucket.private_bucket.bucket}">> /etc/environment
+      echo "REGION=${var.region}">> /etc/environment
       sudo systemctl daemon-reload
       sudo systemctl start myapp.service
       sudo systemctl enable myapp

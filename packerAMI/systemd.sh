@@ -7,6 +7,8 @@ sudo tee /etc/systemd/system/myapp.service > /dev/null <<EOT
 Description=Manage Java service
 [Service]
 WorkingDirectory=/opt/deployment
+EnvironmentFile=/etc/environment
+ExecStart=/usr/bin/java -jar app.jar
 User=jvmapps
 Type=simple
 Restart=on-failure
@@ -15,6 +17,7 @@ RestartSec=10
 WantedBy=multi-user.target
 EOT
 
+#ExecStart=/bin/bash -c 'source /etc/environment && /usr/bin/java -jar app.jar'
 
 #/usr/bin/sudo
 sudo chown -R jvmapps:appmgr /opt/deployment
