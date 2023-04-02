@@ -8,7 +8,7 @@ module "us-west-2-vpc1" {
   public_subnets_num  = 3
   private_subnets_num = 3
   availability_zones  = ["us-west-2a", "us-west-2b", "us-west-2c"]
-  ami-id              = "ami-03491c09ef28d2625"
+  ami-id              = "ami-038f39e8d0e91d650"
   db-username         = "csye6225"
   db-password         = "wu390u3j3b3dn"
   db-name             = "csye6225"

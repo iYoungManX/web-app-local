@@ -106,7 +106,8 @@ resource "aws_security_group" "ec2-security-group" {
     from_port       = 22
     to_port         = 22
     protocol        = "tcp"
-    security_groups = [aws_security_group.load_balancer_sg.id]
+#    security_groups = [aws_security_group.load_balancer_sg.id]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
@@ -115,6 +116,13 @@ resource "aws_security_group" "ec2-security-group" {
     protocol        = "tcp"
     security_groups = [aws_security_group.load_balancer_sg.id]
   }
+
+#  ingress {
+#    from_port       = 8080
+#    to_port         = 8080
+#    protocol        = "tcp"
+#    cidr_blocks = ["0.0.0.0/0"]
+#  }
 
   egress {
     from_port   = 0
@@ -351,6 +359,13 @@ resource "aws_security_group" "load_balancer_sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
 
@@ -372,60 +387,161 @@ resource "aws_lb" "load_balancer" {
   }
 }
 
-data "aws_route53_zone" "public" {
+
+## DNS validation for demo
+data "aws_route53_zone" "demo" {
   name         = "prod.iyoungman.me"
-  private_zone = false
 }
 
-resource "aws_acm_certificate" "api" {
+resource "aws_acm_certificate" "certificate" {
+  domain_name       = "prod.iyoungman.me"
+  validation_method = "DNS"
+  tags = {
+    Environment = "production"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_route53_record" "validation" {
+  allow_overwrite = true
+  name    = element(aws_acm_certificate.certificate.domain_validation_options[*].resource_record_name, 0)
+  type    = element(aws_acm_certificate.certificate.domain_validation_options[*].resource_record_type, 0)
+  records = [element(aws_acm_certificate.certificate.domain_validation_options[*].resource_record_value, 0)]
+  zone_id = data.aws_route53_zone.demo.zone_id
+  ttl     = 60
+}
+
+
+
+resource "aws_acm_certificate_validation" "valid" {
+  certificate_arn         = aws_acm_certificate.certificate.arn
+  validation_record_fqdns = aws_route53_record.validation.*.fqdn
+}
+
+
+## DNS validation for dev
+data "aws_route53_zone" "dev" {
+  provider = aws.dev
+  name         = "dev.iyoungman.me"
+}
+
+resource "aws_acm_certificate" "certificate-dev" {
+  provider = aws.dev
+  domain_name       = "dev.iyoungman.me"
+  validation_method = "DNS"
+  tags = {
+    Environment = "production"
+  }
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_route53_record" "validation-dev" {
+  provider = aws.dev
+  allow_overwrite = true
+  name    = element(aws_acm_certificate.certificate-dev.domain_validation_options[*].resource_record_name, 0)
+  type    = element(aws_acm_certificate.certificate-dev.domain_validation_options[*].resource_record_type, 0)
+  records = [element(aws_acm_certificate.certificate-dev.domain_validation_options[*].resource_record_value, 0)]
+  zone_id = data.aws_route53_zone.dev.zone_id
+  ttl     = 60
+}
+
+
+resource "aws_acm_certificate_validation" "valid-dev" {
+  provider = aws.dev
+  certificate_arn         = aws_acm_certificate.certificate-dev.arn
+  validation_record_fqdns = aws_route53_record.validation-dev.*.fqdn
+}
+
+
+
+
+## DNS validation for root
+data "aws_route53_zone" "root" {
+  provider = aws.root
+  name         = "iyoungman.me"
+}
+
+resource "aws_acm_certificate" "certificate-root" {
+  provider = aws.root
   domain_name       = "iyoungman.me"
   validation_method = "DNS"
+  tags = {
+    Environment = "production"
+  }
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
-
-
-resource "aws_route53_record" "api_validation" {
-  for_each = {
-  for dvo in aws_acm_certificate.api.domain_validation_options : dvo.domain_name => {
-    name   = dvo.resource_record_name
-    record = dvo.resource_record_value
-    type   = dvo.resource_record_type
-  }
-  }
+resource "aws_route53_record" "validation-root" {
+  provider = aws.root
   allow_overwrite = true
-  name            = each.value.name
-  records         = [each.value.record]
-  ttl             = 60
-  type            = each.value.type
-  zone_id         = data.aws_route53_zone.public.zone_id
-}
-
-resource "aws_acm_certificate_validation" "api" {
-  certificate_arn         = aws_acm_certificate.api.arn
-  validation_record_fqdns = [for record in aws_route53_record.api_validation : record.fqdn]
+  name    = element(aws_acm_certificate.certificate-root.domain_validation_options[*].resource_record_name, 0)
+  type    = element(aws_acm_certificate.certificate-root.domain_validation_options[*].resource_record_type, 0)
+  records = [element(aws_acm_certificate.certificate-root.domain_validation_options[*].resource_record_value, 0)]
+  zone_id = data.aws_route53_zone.root.zone_id
+  ttl     = 60
 }
 
 
-resource "aws_route53_record" "api" {
-  name    = aws_acm_certificate.api.domain_name
-  type    = "A"
-  zone_id = data.aws_route53_zone.public.zone_id
-  alias {
-    name                   = aws_lb.load_balancer.dns_name
-    zone_id                = aws_lb.load_balancer.zone_id
-    evaluate_target_health = false
+
+resource "aws_acm_certificate_validation" "valid-root" {
+  provider = aws.root
+  certificate_arn         = aws_acm_certificate.certificate-root.arn
+  validation_record_fqdns = aws_route53_record.validation-root.*.fqdn
+}
+
+
+
+#
+#resource "aws_lb_listener" "aws_lb_listeners-dev" {
+#  provider = aws.dev
+#  load_balancer_arn = aws_lb.load_balancer.arn
+#  port              = "443"
+#  protocol          = "HTTPS"
+#  ssl_policy        = "ELBSecurityPolicy-2016-08"
+#  certificate_arn   = aws_acm_certificate_validation.valid-dev.certificate_arn
+#  default_action {
+#    type             = "forward"
+#    target_group_arn = aws_lb_target_group.ls_target_group.arn
+#  }
+#}
+
+resource "aws_lb_listener" "aws_lb_listeners-demo" {
+  load_balancer_arn = aws_lb.load_balancer.arn
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = aws_acm_certificate_validation.valid.certificate_arn
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.ls_target_group.arn
   }
 }
-
-resource "aws_lb_listener" "https_listener" {
-  load_balancer_arn = aws_lb.load_balancer.arn
-  port              = 443
-  protocol          = "HTTPS"
-  certificate_arn   = aws_acm_certificate.api.arn
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
+#
+#resource "aws_lb_listener" "aws_lb_listeners-root" {
+#  provider = aws.root
+#  load_balancer_arn = aws_lb.load_balancer.arn
+#  port              = "443"
+#  protocol          = "HTTPS"
 #  ssl_policy        = "ELBSecurityPolicy-2016-08"
-#  certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/abcd1234-abcd-1234-abcd-1234abcd5678"
+#  certificate_arn   = aws_acm_certificate_validation.valid-root.certificate_arn
+#  default_action {
+#    type             = "forward"
+#    target_group_arn = aws_lb_target_group.ls_target_group.arn
+#  }
+#}
 
+resource "aws_lb_listener" "aws_lb_listeners-80" {
+  load_balancer_arn = aws_lb.load_balancer.arn
+  port              = "80"
+  protocol          = "HTTP"
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.ls_target_group.arn
@@ -472,14 +588,14 @@ resource "aws_lb_target_group" "ls_target_group" {
   target_type = "instance"
   load_balancing_algorithm_type = "round_robin"
   health_check {
-    enabled             = true
-    port                = 8080
-    interval            = 30
-    protocol            = "HTTP"
+#    enabled             = true
+#    port                = 8080
+#    interval            = 30
+#    protocol            = "HTTP"
     path                = "/healthz"
-    matcher             = "200"
-    healthy_threshold   = 3
-    unhealthy_threshold = 3
+#    matcher             = "200"
+#    healthy_threshold   = 3
+#    unhealthy_threshold = 3
   }
 }
 
@@ -487,47 +603,38 @@ resource "aws_autoscaling_group" "autoscaling" {
   name                      = "asg"
   launch_configuration      = aws_launch_configuration.launch_config.id
   min_size                  = 1
-  max_size                  = 3
+  max_size                  = 5
   desired_capacity          = 1
-  health_check_grace_period = 300
+#  health_check_grace_period = 300
   health_check_type         = "EC2"
   default_cooldown          = 60
 
   vpc_zone_identifier = [
     aws_subnet.public[0].id,aws_subnet.public[1].id,aws_subnet.public[2].id
   ]
-
-
-
-#  policy_names = [
-#    aws_autoscaling_policy.scale_up_policy.name,
-#    aws_autoscaling_policy.scale_down_policy.name
-#  ]
-
   target_group_arns = [
     aws_lb_target_group.ls_target_group.arn
   ]
-
 }
 
 
 resource "aws_autoscaling_policy" "scale_up_policy" {
-  name                   = "terramino_scale_down"
+  name                   = "scale_up"
   autoscaling_group_name = aws_autoscaling_group.autoscaling.name
   adjustment_type        = "ChangeInCapacity"
-  scaling_adjustment     = -1
-  cooldown               = 120
+  scaling_adjustment     = 1
+  cooldown               = 60
 }
 
-resource "aws_cloudwatch_metric_alarm" "cpu_utilization_scale_up_alarm" {
+resource "aws_cloudwatch_metric_alarm" "scale_up_alarm" {
   alarm_description   = "Monitors CPU utilization for Terramino ASG"
   alarm_actions       = [aws_autoscaling_policy.scale_up_policy.arn]
   alarm_name          = "cpu_utilization_scale_up_alarm"
   comparison_operator = "GreaterThanThreshold"
   namespace           = "AWS/EC2"
   metric_name         = "CPUUtilization"
-  threshold           = "5"
-  evaluation_periods  = "2"
+  threshold           = 5
+  evaluation_periods  = 1
   period              = "60"
   statistic           = "Average"
   dimensions = {
@@ -535,96 +642,31 @@ resource "aws_cloudwatch_metric_alarm" "cpu_utilization_scale_up_alarm" {
   }
 }
 
-
-
-
-#resource "aws_cloudwatch_metric_alarm" "cpu_utilization_scale_up_alarm" {
-#  alarm_name          = "cpu-utilization-scale-up-alarm"
-#  comparison_operator = "GreaterThanThreshold"
-#  evaluation_periods  = 2
-#  metric_name         = "CPUUtilization"
-#  namespace           = "AWS/EC2"
-#  period              = "60"
-#  statistic           = "Average"
-#  threshold           = 5
-#
-#  alarm_description = "This metric checks if CPU utilization is greater than 5% for 2 minutes"
-#
-#  dimensions = {
-#    AutoScalingGroupName = aws_autoscaling_group.autoscaling.name
-#  }
-#
-#  alarm_actions = [aws_autoscaling_policy.scale_up_policy.arn]
-#}
-#
-## Create scale-up policy
-#resource "aws_autoscaling_policy" "scale_up_policy" {
-#  name                   = "scale-up-policy"
-#  policy_type            = "StepScaling"
-#  adjustment_type        = "ChangeInCapacity"
-#  cooldown               = 60
-#  autoscaling_group_name = aws_autoscaling_group.autoscaling.name
-#
-#  step_adjustment {
-#    metric_interval_lower_bound = 0
-#    scaling_adjustment           = 1
-#  }
-#
-#  # Add CloudWatch metric for CPU utilization
-#  metric_aggregation_type = "Average"
-#  estimated_instance_warmup = 60
-#
-#  target_tracking_configuration {
-#    predefined_metric_specification {
-#      predefined_metric_type = "ASGAverageCPUUtilization"
-#    }
-#    target_value = 5
-#  }
-#}
-
-# Create scale-down policy
 resource "aws_autoscaling_policy" "scale_down_policy" {
-  name                   = "scale-down-policy"
-  policy_type            = "StepScaling"
-  adjustment_type        = "ChangeInCapacity"
-  cooldown               = 60
+  name                   = "scale_down"
   autoscaling_group_name = aws_autoscaling_group.autoscaling.name
-
-  step_adjustment {
-    metric_interval_upper_bound = 0
-    scaling_adjustment           = -1
-  }
-
-  # Add CloudWatch metric for CPU utilization
-  metric_aggregation_type = "Average"
-  estimated_instance_warmup = 60
-
-  target_tracking_configuration {
-    predefined_metric_specification {
-      predefined_metric_type = "ASGAverageCPUUtilization"
-    }
-    target_value = 3
-  }
+  adjustment_type        = "ChangeInCapacity"
+  scaling_adjustment     = -1
+  cooldown               = 60
 }
 
-
-resource "aws_cloudwatch_metric_alarm" "cpu_utilization_scale_down_alarm" {
-  alarm_name          = "cpu-utilization-scale-down-alarm"
+resource "aws_cloudwatch_metric_alarm" "scale_down_alarm" {
+  alarm_description   = "Monitors CPU utilization for Terramino ASG"
+  alarm_actions       = [aws_autoscaling_policy.scale_down_policy.arn]
+  alarm_name          = "cpu_utilization_scale_down_alarm"
   comparison_operator = "LessThanThreshold"
-  evaluation_periods  = 2
-  metric_name         = "CPUUtilization"
   namespace           = "AWS/EC2"
+  metric_name         = "CPUUtilization"
+  threshold           = 3
+  evaluation_periods  = 1
   period              = "60"
   statistic           = "Average"
-  threshold           = 3
-
-  alarm_description = "This metric checks if CPU utilization is less than 3% for 2 minutes"
-
   dimensions = {
     AutoScalingGroupName = aws_autoscaling_group.autoscaling.name
   }
-  alarm_actions = [aws_autoscaling_policy.scale_down_policy.arn]
 }
+
+
 
 
 
