@@ -81,6 +81,22 @@ variable "demo-zone-id" {
   default = "iyoungman.me"
 }
 
+variable "domain" {
+  default = "iyoungman.me"
+}
+
+variable "dev-zone-id" {
+  default = "iyoungman.me"
+}
+
+variable "root-zone-id" {
+  default = "iyoungman.me"
+}
+
+variable "demo-zone-id" {
+  default = "iyoungman.me"
+}
+
 
 
 

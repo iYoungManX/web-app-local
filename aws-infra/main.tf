@@ -16,6 +16,7 @@ module "us-west-2-vpc1" {
   demo-zone-id        = "Z09073211FPNN9I37EC02"
   root-zone-id        = "Z09142753S1FC885ZIEXA"
   dev-zone-id         = "Z0766292TJ20O61HROJW"
+
 }
 
 

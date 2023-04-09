@@ -297,6 +297,7 @@ resource "aws_iam_instance_profile" "ec2_profile" {
 
 
 
+
 #resource "aws_instance" "ec2-instance" {
 #  ami                         = var.ami-id # Replace with your custom AMI ID
 #  instance_type               = "t2.micro"
