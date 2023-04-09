@@ -71,44 +71,44 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       REGION: ${{ secrets.REGION }}
-      steps:
-        - uses: actions/checkout@v3
+    steps:
+      - uses: actions/checkout@v3
 
-        - name: Check the IMAGE_ID
-          needs: get_ami_id
-          run:
-            echo $IMAGE_ID
+      - name: Check the IMAGE_ID
+        needs: get_ami_id
+        run:
+          echo $IMAGE_ID
 
-        - name: Get the LaunchTemplateId
-          needs: get_ami_id
-          run:
-            LAUNCH_TEMPLATE_ID=$(aws_demo ec2 describe-launch-templates \
-            --query "LaunchTemplates[?LaunchTemplateName=='launch_config'].LaunchTemplateId" \
-            --output text)
-            echo $LAUNCH_TEMPLATE_ID
+      - name: Get the LaunchTemplateId
+        needs: get_ami_id
+        run:
+          LAUNCH_TEMPLATE_ID=$(aws_demo ec2 describe-launch-templates \
+          --query "LaunchTemplates[?LaunchTemplateName=='launch_config'].LaunchTemplateId" \
+          --output text)
+          echo $LAUNCH_TEMPLATE_ID
 
-        - name: Update the LaunchTemplateVersion
-          needs: get_ami_id
-          run:
-            export LAUNCH_TEMPLATE_ID=${{ env.LAUNCH_TEMPLATE_ID }}
-            aws ec2 create-launch-template-version \
-            --launch-template-id $LAUNCH_TEMPLATE_ID \
-            --launch-template-data '{"ImageId":"'${IMAGE_ID}'", "InstanceType":"t2.micro"}'
+      - name: Update the LaunchTemplateVersion
+        needs: get_ami_id
+        run:
+          export LAUNCH_TEMPLATE_ID=${{ env.LAUNCH_TEMPLATE_ID }}
+          aws ec2 create-launch-template-version \
+          --launch-template-id $LAUNCH_TEMPLATE_ID \
+          --launch-template-data '{"ImageId":"'${IMAGE_ID}'", "InstanceType":"t2.micro"}'
 
-        - name: Update the auto_scaling_group
-          needs: get_ami_id
-          run:
-            aws autoscaling update-auto-scaling-group \
-            --auto-scaling-group-name asg \
-            --launch-template LaunchTemplateId=$LAUNCH_TEMPLATE_ID,Version='$Latest' \
-            --min-size 1 \
-            --max-size 3 \
-            --desired-capacity 1
+      - name: Update the auto_scaling_group
+        needs: get_ami_id
+        run:
+          aws autoscaling update-auto-scaling-group \
+          --auto-scaling-group-name asg \
+          --launch-template LaunchTemplateId=$LAUNCH_TEMPLATE_ID,Version='$Latest' \
+          --min-size 1 \
+          --max-size 3 \
+          --desired-capacity 1
 
-        - name: refresh
-          run:
-            aws_demo autoscaling start-instance-refresh \
-            --auto-scaling-group-name ags \
+      - name: refresh
+        run:
+          aws_demo autoscaling start-instance-refresh \
+          --auto-scaling-group-name ags \
 
 
 
