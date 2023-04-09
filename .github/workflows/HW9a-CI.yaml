@@ -97,7 +97,7 @@ jobs:
           --query "LaunchTemplates[?LaunchTemplateName=='launch_config'].LaunchTemplateId" \
           --region $REGION \
           --output text)
-          echo "::set-env LAUNCH_TEMPLATE_ID::$LAUNCH_TEMPLATE_ID"
+          echo "::set-env name=LAUNCH_TEMPLATE_ID::$LAUNCH_TEMPLATE_ID"
           
 
       - name: Update the LaunchTemplateVersion
