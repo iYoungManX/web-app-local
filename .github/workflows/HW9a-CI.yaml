@@ -65,7 +65,7 @@ jobs:
       - id: step1
         name: Get the image ID
         run: |
-          IMAGE_ID=$(aws ec2 describe-images --owners self --region us-west-2 --filters Name=is-public,Values=false Name=state,Values=available --query 'reverse(sort_by(Images, &CreationDate))[:1].ImageId' --output text )
+          IMAGE_ID=$(aws ec2 describe-images --owners self --region $REGION --filters Name=is-public,Values=false Name=state,Values=available --query 'reverse(sort_by(Images, &CreationDate))[:1].ImageId' --output text )
           echo "IMAGE_ID=${IMAGE_ID}" >> "$GITHUB_OUTPUT"
           echo $IMAGE_ID
 
@@ -91,28 +91,33 @@ jobs:
         run:
           echo $IMAGE_ID
 
-      - name: Get the LaunchTemplateId
+      - id: step1
+        name: Get the LaunchTemplateId
         run: |
           LAUNCH_TEMPLATE_ID=$(aws ec2 describe-launch-templates \
           --query "LaunchTemplates[?LaunchTemplateName=='launch_config'].LaunchTemplateId" \
           --region $REGION \
           --output text)
-          echo "::set-env name=LAUNCH_TEMPLATE_ID::$LAUNCH_TEMPLATE_ID"
+          echo "::set-output name=LAUNCH_TEMPLATE_ID::$LAUNCH_TEMPLATE_ID"
           
 
       - name: Update the LaunchTemplateVersion
+        env:
+          LAUNCH_TEMPLATE_ID: ${{ steps.step1.outputs.LAUNCH_TEMPLATE_ID }}
         run: |
           aws ec2 create-launch-template-version \
           --launch-template-id $LAUNCH_TEMPLATE_ID \
-          --region us-west-2 \
+          --region $REGION \
           --launch-template-data '{"ImageId":"'${IMAGE_ID}'", "InstanceType":"t2.micro"}'
 
       - name: Update the auto_scaling_group
+        env:
+          LAUNCH_TEMPLATE_ID: ${{ steps.step1.outputs.LAUNCH_TEMPLATE_ID }}
         run:
           aws autoscaling update-auto-scaling-group \
           --auto-scaling-group-name asg \
           --launch-template LaunchTemplateId=$LAUNCH_TEMPLATE_ID,Version='$Latest' \
-          --region us-west-2 \
+          --region $REGION \
           --min-size 1 \
           --max-size 3 \
           --desired-capacity 1
@@ -120,6 +125,6 @@ jobs:
       - name: refresh
         run:
           aws autoscaling start-instance-refresh \
-          --region us-west-2 \
+          --region $REGION \
           --auto-scaling-group-name ags \
 
