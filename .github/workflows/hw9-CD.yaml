@@ -69,10 +69,6 @@ jobs:
           echo $IMAGE_ID
 
 
-
-
-
-
   update_launch_template:
     needs: get_ami_id
     if: github.event.pull_request.merged == true

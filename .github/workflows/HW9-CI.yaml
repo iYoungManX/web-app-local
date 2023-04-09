@@ -14,7 +14,6 @@ on:
   pull_request:
     branches:
       - main
-
 jobs:
   hw9-CI:
     runs-on: ubuntu-latest
@@ -28,8 +27,6 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
-
-
       - name: CI
         run:
           mvn test package
