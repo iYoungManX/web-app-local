@@ -55,7 +55,7 @@ jobs:
       REGION: ${{ secrets.REGION }}
 
     outputs:
-      output1: ${{ steps.step1.outputs.IMAGE_ID }}
+      IMAGE_ID: ${{ steps.step1.outputs.IMAGE_ID }}
 
     steps:
       - uses: actions/checkout@v3
@@ -67,6 +67,8 @@ jobs:
           --filters Name=is-public,Values=false Name=state,Values=available \
           --query 'reverse(sort_by(Images, &CreationDate))[:1].ImageId' --output text )
           echo "IMAGE_ID=${IMAGE_ID}" >> "$GITHUB_OUTPUT"
+          echo $IMAGE_ID
+
 
 
   update_launch_template:
