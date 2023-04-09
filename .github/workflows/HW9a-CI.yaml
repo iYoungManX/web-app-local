@@ -51,6 +51,9 @@ jobs:
 
       - name: Update Auto Scaling Group
         run: |
+          echo $IMAGE_ID
+          echo $LAUNCH_TEMPLATE_ID
+          echo ${{ steps.create-launch-template.outputs.LAUNCH_TEMPLATE_ID }}
           aws --profile demo autoscaling update-auto-scaling-group \
           --auto-scaling-group-name asg \
           --launch-template LaunchTemplateId=${{ steps.create-launch-template.outputs.LAUNCH_TEMPLATE_ID }},Version='$Latest' \

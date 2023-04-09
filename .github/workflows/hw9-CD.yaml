@@ -73,6 +73,7 @@ jobs:
 
           echo "::set-output name=IMAGE_ID::${IMAGE_ID}"
           echo "::set-output name=LAUNCH_TEMPLATE_ID::${LAUNCH_TEMPLATE_ID}"
+          
 
       - name: Update Auto Scaling Group
         run: |
