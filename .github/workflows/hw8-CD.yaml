@@ -13,6 +13,10 @@ name: HW-8 CD
 #    branches:
 #      - main
 #    types: [closed]
+on:
+  push:
+    branches:
+      - xxx
 
 
 jobs:

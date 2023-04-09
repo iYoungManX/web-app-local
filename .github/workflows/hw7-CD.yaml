@@ -12,7 +12,10 @@ name: HW-7 CD
 #    branches:
 #      - main
 #    types: [closed]
-
+on:
+  push:
+    branches:
+      - xxx
 jobs:
   build-image:
     if: github.event.pull_request.merged == true
