@@ -102,6 +102,7 @@ jobs:
           
           aws ec2 create-launch-template-version \
           --launch-template-id $LAUNCH_TEMPLATE_ID \
+          --region us-west-2 \
           --launch-template-data '{"ImageId":"'${IMAGE_ID}'", "InstanceType":"t2.micro"}'
           
           aws autoscaling update-auto-scaling-group \
