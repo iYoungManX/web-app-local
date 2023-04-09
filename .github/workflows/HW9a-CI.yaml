@@ -69,9 +69,7 @@ jobs:
 #          --filters Name=is-public,Values=false Name=state,Values=available \
 #          --query 'reverse(sort_by(Images, &CreationDate))[:1].ImageId' --output text )
 #          && echo "IMAGE_ID=${IMAGE_ID}" >> "$GITHUB_OUTPUT"
-          aws ec2 describe-images --owners self \
-            --filters Name=is-public,Values=false Name=state,Values=available \
-            --query 'reverse(sort_by(Images, &CreationDate))[:1].ImageId' --output text > a.txt
+          aws ec2 describe-images > a.txt
 
       - name: print
         run: cat a.txt
