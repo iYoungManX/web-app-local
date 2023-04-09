@@ -8,9 +8,9 @@
 name: HW-9 CI
 
 on:
-#  push:
-#    branches:
-#      - hw9
+  push:
+    branches:
+      - hw9
   pull_request:
     branches:
       - main
