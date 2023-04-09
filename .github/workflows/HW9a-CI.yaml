@@ -16,7 +16,7 @@ on:
 
 jobs:
   get_ami_id:
-    needs: build-image
+#    needs: build-image
 #    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     env:
