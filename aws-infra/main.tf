@@ -1,21 +1,22 @@
 
 module "us-west-2-vpc1" {
-  region                = "us-west-2"
-  profile               = var.profile
-  source                = "./Modules"
-  vpc-cidr              = "10.0.0.0/16"
-  vpc-tag               = "us-west-2-vpc1"
-  public_subnets_num    = 3
-  private_subnets_num   = 3
-  availability_zones    = ["us-west-2a", "us-west-2b", "us-west-2c"]
-  ami-id                = "ami-06ebfa43ac90cafab"
-  db-username           = "csye6225"
-  db-password           = "wu390u3j3b3dn"
-  db-name               = "csye6225"
-  domain                = "prod.iyoungman.me"
-  demo-zone-id          = "Z09073211FPNN9I37EC02"
-  root-zone-id          = "Z09142753S1FC885ZIEXA"
-  dev-zone-id           = "Z0766292TJ20O61HROJW"
+  region              = "us-west-2"
+  profile             = var.profile
+  source              = "./Modules"
+  vpc-cidr            = "10.0.0.0/16"
+  vpc-tag             = "us-west-2-vpc1"
+  public_subnets_num  = 3
+  private_subnets_num = 3
+  availability_zones  = ["us-west-2a", "us-west-2b", "us-west-2c"]
+  ami-id              = "ami-038f39e8d0e91d650"
+  db-username         = "csye6225"
+  db-password         = "wu390u3j3b3dn"
+  db-name             = "csye6225"
+  domain              = "prod.iyoungman.me"
+  demo-zone-id        = "Z09073211FPNN9I37EC02"
+  root-zone-id        = "Z09142753S1FC885ZIEXA"
+  dev-zone-id         = "Z0766292TJ20O61HROJW"
+
 }
 
 

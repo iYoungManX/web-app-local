@@ -11,9 +11,10 @@ on:
   push:
     branches:
       - hw7
-  pull_request:
-    branches:
-      - main
+#  pull_request:
+#    branches:
+#      - main
+
 
 jobs:
   hw7-CI:
