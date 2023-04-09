@@ -113,7 +113,7 @@ jobs:
       - name: Update the auto_scaling_group
         env:
           LAUNCH_TEMPLATE_ID: ${{ steps.step1.outputs.LAUNCH_TEMPLATE_ID }}
-        run:
+        run: |
           aws autoscaling update-auto-scaling-group \
           --auto-scaling-group-name asg \
           --launch-template LaunchTemplateId=$LAUNCH_TEMPLATE_ID,Version='$Latest' \
@@ -123,8 +123,8 @@ jobs:
           --desired-capacity 1
 
       - name: refresh
-        run:
+        run: |
           aws autoscaling start-instance-refresh \
           --region $REGION \
-          --auto-scaling-group-name ags \
+          --auto-scaling-group-name asg \
 
