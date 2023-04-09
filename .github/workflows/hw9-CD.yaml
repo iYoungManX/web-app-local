@@ -14,14 +14,15 @@ on:
     types: [closed]
 
 jobs:
-  build-image:
+  hw9-CD:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
 
     env:
+      AWS_EC2_METADATA_DISABLED: true
+      AWS_DEFAULT_REGION: ${{ secrets.REGION }}
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      REGION: ${{ secrets.REGION }}
 
     steps:
       - uses: actions/checkout@v3
@@ -44,82 +45,45 @@ jobs:
       - name: Run packer build
         run: cd packerAMI && packer build pack.pkr.hcl
 
-
-
-  get_ami_id:
-    needs: build-image
-    if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      REGION: ${{ secrets.REGION }}
-      AWS_EC2_METADATA_DISABLED: true
-
-    outputs:
-      IMAGE_ID: ${{ steps.step1.outputs.IMAGE_ID }}
-
-    steps:
-      - uses: actions/checkout@v3
-      - id: step1
-        name: Get the image ID
+      - name: Configure AWS CLI
         run: |
-          IMAGE_ID=$(aws ec2 describe-images --owners self --region $REGION --filters Name=is-public,Values=false Name=state,Values=available --query 'reverse(sort_by(Images, &CreationDate))[:1].ImageId' --output text )
-          echo "IMAGE_ID=${IMAGE_ID}" >> "$GITHUB_OUTPUT"
-          echo $IMAGE_ID
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} --profile dev
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }} --profile dev
+          aws configure set default.region $AWS_DEFAULT_REGION --profile dev
+          aws configure set default.output json --profile dev
 
+          aws configure set aws_access_key_id ${{ secrets.DEMO_AWS_ACCESS_KEY_ID }} --profile demo
+          aws configure set aws_secret_access_key ${{ secrets.DEMO_AWS_SECRET_ACCESS_KEY }} --profile demo
+          aws configure set default.region $AWS_DEFAULT_REGION --profile demo
+          aws configure set default.output json --profile demo
 
-  update_launch_template:
-    needs: get_ami_id
-    if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.DEMO_AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.DEMO_AWS_SECRET_ACCESS_KEY }}
-      REGION: ${{ secrets.REGION }}
-      IMAGE_ID: ${{needs.get_ami_id.outputs.IMAGE_ID}}
-      AWS_EC2_METADATA_DISABLED: true
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Check the IMAGE_ID
-        run:
-          echo $IMAGE_ID
-
-      - id: step1
-        name: Get the LaunchTemplateId
+      - name: Create Launch Template Version.
+        id: create-launch-template
         run: |
-          LAUNCH_TEMPLATE_ID=$(aws ec2 describe-launch-templates \
-          --query "LaunchTemplates[?LaunchTemplateName=='launch_config'].LaunchTemplateId" \
-          --region $REGION \
+          IMAGE_ID=$(aws --profile dev ec2 describe-images --owners self \
+          --filters Name=is-public,Values=false Name=state,Values=available \
+          --query 'reverse(sort_by(Images, &CreationDate))[:1].ImageId' \
           --output text)
-          echo "::set-output name=LAUNCH_TEMPLATE_ID::$LAUNCH_TEMPLATE_ID"
 
+          LAUNCH_TEMPLATE_ID=$(aws --profile demo ec2 describe-launch-templates --query "LaunchTemplates[?LaunchTemplateName=='launch_config'].LaunchTemplateId" --output text)
 
-      - name: Update the LaunchTemplateVersion
-        env:
-          LAUNCH_TEMPLATE_ID: ${{ steps.step1.outputs.LAUNCH_TEMPLATE_ID }}
+          aws --profile demo ec2 create-launch-template-version --launch-template-id ${LAUNCH_TEMPLATE_ID} --launch-template-data '{"ImageId":"'${IMAGE_ID}'", "InstanceType":"t2.micro"}'
+
+          echo "::set-output name=IMAGE_ID::${IMAGE_ID}"
+          echo "::set-output name=LAUNCH_TEMPLATE_ID::${LAUNCH_TEMPLATE_ID}"
+
+      - name: Update Auto Scaling Group
         run: |
-          aws ec2 create-launch-template-version \
-          --launch-template-id $LAUNCH_TEMPLATE_ID \
-          --region $REGION \
-          --launch-template-data '{"ImageId":"'${IMAGE_ID}'", "InstanceType":"t2.micro"}'
-
-      - name: Update the auto_scaling_group
-        env:
-          LAUNCH_TEMPLATE_ID: ${{ steps.step1.outputs.LAUNCH_TEMPLATE_ID }}
-        run: |
-          aws autoscaling update-auto-scaling-group \
+          aws --profile demo autoscaling update-auto-scaling-group \
           --auto-scaling-group-name asg \
-          --launch-template LaunchTemplateId=$LAUNCH_TEMPLATE_ID,Version='$Latest' \
-          --region $REGION \
+          --launch-template LaunchTemplateId=${{ steps.create-launch-template.outputs.LAUNCH_TEMPLATE_ID }},Version='$Latest' \
           --min-size 1 \
           --max-size 3 \
           --desired-capacity 1
 
-      - name: refresh
+      - name: Refresh Auto Scaling Group Instances
         run: |
-          aws autoscaling start-instance-refresh \
-          --region $REGION \
-          --auto-scaling-group-name asg \
+          aws --profile demo autoscaling start-instance-refresh \
+          --auto-scaling-group-name asg
+
 
