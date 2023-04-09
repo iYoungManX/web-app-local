@@ -25,9 +25,6 @@ public class UserController {
     @Autowired
     StatsDClient statsDClient;
 
-
-
-
     @GetMapping("/{id}")
     public UserVO getUser(@PathVariable Long id) {
         statsDClient.incrementCounter(Metrics.GET_USER);

@@ -17,6 +17,7 @@ RestartSec=10
 WantedBy=multi-user.target
 EOT
 
+
 #ExecStart=/bin/bash -c 'source /etc/environment && /usr/bin/java -jar app.jar'
 
 #/usr/bin/sudo

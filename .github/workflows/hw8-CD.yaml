@@ -7,11 +7,13 @@
 
 
 name: HW-8 CD
+
 #on:
 #  pull_request:
 #    branches:
 #      - main
 #    types: [closed]
+
 
 jobs:
   build-image:

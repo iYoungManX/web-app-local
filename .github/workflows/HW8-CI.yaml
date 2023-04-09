@@ -5,19 +5,18 @@
 # They are provided by a third-party and are governed by
 # separate terms of service, privacy policy, and support
 # documentation.
-name: HW-7 CI
+name: HW-8 CI
 
 on:
   push:
     branches:
-      - hw7
-#  pull_request:
-#    branches:
-#      - main
-
+      - hw8
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  hw7-CI:
+  hw8-CI:
     runs-on: ubuntu-latest
     env:
       REGION: ${{ secrets.REGION }}

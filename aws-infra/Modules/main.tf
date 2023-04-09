@@ -1,4 +1,3 @@
-
 provider "aws" {
   #  alias = "demo"
   region  = var.region
@@ -72,7 +71,7 @@ resource "aws_route_table_association" "public" {
   subnet_id      = aws_subnet.public[count.index].id
   route_table_id = aws_route_table.public.id
 }
-# Create  3 private subnet 
+# Create  3 private subnet
 resource "aws_subnet" "private" {
   count             = 3
   cidr_block        = cidrsubnet(var.vpc-cidr, 8, count.index + var.public_subnets_num + 1)
@@ -106,7 +105,7 @@ resource "aws_security_group" "ec2-security-group" {
     from_port       = 22
     to_port         = 22
     protocol        = "tcp"
-#    security_groups = [aws_security_group.load_balancer_sg.id]
+    #    security_groups = [aws_security_group.load_balancer_sg.id]
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -117,12 +116,12 @@ resource "aws_security_group" "ec2-security-group" {
     security_groups = [aws_security_group.load_balancer_sg.id]
   }
 
-#  ingress {
-#    from_port       = 8080
-#    to_port         = 8080
-#    protocol        = "tcp"
-#    cidr_blocks = ["0.0.0.0/0"]
-#  }
+  #  ingress {
+  #    from_port       = 8080
+  #    to_port         = 8080
+  #    protocol        = "tcp"
+  #    cidr_blocks = ["0.0.0.0/0"]
+  #  }
 
   egress {
     from_port   = 0
@@ -547,7 +546,7 @@ resource "aws_lb_listener" "aws_lb_listeners-demo" {
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-#  certificate_arn   = aws_acm_certificate_validation.valid.certificate_arn
+  #  certificate_arn   = aws_acm_certificate_validation.valid.certificate_arn
   certificate_arn = var.certificate_arn
   default_action {
     type             = "forward"
@@ -682,22 +681,22 @@ resource "aws_launch_template" "launch_config" {
 
   network_interfaces {
     associate_public_ip_address = true
-#    subnet_id =  aws_subnet.public[0].id
+    #    subnet_id =  aws_subnet.public[0].id
     security_groups = [aws_security_group.ec2-security-group.id]
   }
   user_data = base64encode(data.template_file.user_data.rendered)
 
-   block_device_mappings {
-     device_name = "/dev/xvda"
-#     device_name = "/dev/sda1"
-     ebs {
-       delete_on_termination = true
-       volume_type = "gp2"
-       volume_size = 8
-       encrypted   = true
-       kms_key_id  = aws_kms_key.ec2_ebs_key.arn
-     }
-   }
+  block_device_mappings {
+    device_name = "/dev/xvda"
+    #     device_name = "/dev/sda1"
+    ebs {
+      delete_on_termination = true
+      volume_type = "gp2"
+      volume_size = 8
+      encrypted   = true
+      kms_key_id  = aws_kms_key.ec2_ebs_key.arn
+    }
+  }
 }
 
 
@@ -711,24 +710,24 @@ resource "aws_lb_target_group" "lb_target_group" {
   target_type = "instance"
   load_balancing_algorithm_type = "round_robin"
   health_check {
-#    enabled             = true
-#    port                = 8080
-#    interval            = 30
-#    protocol            = "HTTP"
+    #    enabled             = true
+    #    port                = 8080
+    #    interval            = 30
+    #    protocol            = "HTTP"
     path                = "/healthz"
-#    matcher             = "200"
-#    healthy_threshold   = 3
-#    unhealthy_threshold = 3
+    #    matcher             = "200"
+    #    healthy_threshold   = 3
+    #    unhealthy_threshold = 3
   }
 }
 
 resource "aws_autoscaling_group" "autoscaling" {
   name                      = "asg"
-#  launch_configuration      = aws_launch_configuration.launch_config.id
+  #  launch_configuration      = aws_launch_configuration.launch_config.id
   min_size                  = 1
   max_size                  = 3
   desired_capacity          = 1
-#  health_check_grace_period = 300
+  #  health_check_grace_period = 300
   health_check_type         = "EC2"
   default_cooldown          = 60
 
@@ -845,8 +844,3 @@ resource "aws_route53_record" "record-dev" {
     create_before_destroy = true
   }
 }
-
-
-
-
-
