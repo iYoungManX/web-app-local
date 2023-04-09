@@ -115,7 +115,7 @@ jobs:
           
           aws autoscaling start-instance-refresh \
           --region us-west-2 \
-          --auto-scaling-group-name ags \
+          --auto-scaling-group-name asg \
 
 #
 #      - name: Update the LaunchTemplateVersion
