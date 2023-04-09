@@ -65,8 +65,8 @@ jobs:
         run: |
           IMAGE_ID=$(aws ec2 describe-images --owners self \
           --filters Name=is-public,Values=false Name=state,Values=available \
-          --query 'reverse(sort_by(Images, &CreationDate))[:1].ImageId' --output text )
-          echo "IMAGE_ID=${IMAGE_ID}" >> "$GITHUB_OUTPUT"
+          --query 'reverse(sort_by(Images, &CreationDate))[:1].ImageId' --output text ) &&
+          echo "IMAGE_ID=${IMAGE_ID}" >> "$GITHUB_OUTPUT" &&
           echo $IMAGE_ID
 
 
