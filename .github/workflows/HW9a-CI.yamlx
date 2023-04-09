@@ -4,14 +4,16 @@
 # This workflow uses actions that are not certified by GitHub.
 # They are provided by a third-party and are governed by
 # separate terms of service, privacy policy, and support
+# documentation.
+name: HW-9 CI
 
-
-name: HW-9 CD
 on:
+  push:
+    branches:
+      - hw9
   pull_request:
     branches:
       - main
-    types: [closed]
 
 jobs:
   build-image:
@@ -98,7 +100,7 @@ jobs:
           --region $REGION \
           --output text)
           echo "::set-output name=LAUNCH_TEMPLATE_ID::$LAUNCH_TEMPLATE_ID"
-
+          
 
       - name: Update the LaunchTemplateVersion
         env:
