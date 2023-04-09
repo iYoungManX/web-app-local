@@ -180,11 +180,21 @@ resource "aws_kms_key" "rds_kms_key" {
         "Sid": "Enable IAM User Permissions",
         "Effect": "Allow",
         "Principal": {
-          "AWS": "arn:aws:iam::050297369388:root"
+          "AWS": ["arn:aws:iam::050297369388:root",aws_iam_role.ec2_EC2-CSYE6225role.arn]
         },
         "Action": "kms:*",
         "Resource": "*"
+      },
+      {
+        "Sid" : "Enable kms access for auto scaling",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : "arn:aws:iam::050297369388:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+        },
+        "Action" : "kms:*",
+        "Resource" : "*",
       }
+
     ]
   })
 }
@@ -570,7 +580,7 @@ resource "aws_lb_listener" "aws_lb_listeners-80" {
 
 
 resource "aws_kms_key" "ec2_ebs_key" {
-  description = "Example customer-managed KMS key"
+  description = "customer-managed KMS key"
   # Allow the IAM user or role specified in the "principal" block to use the key
   policy = jsonencode({
     Version = "2012-10-17"
@@ -579,10 +589,19 @@ resource "aws_kms_key" "ec2_ebs_key" {
         "Sid": "Enable IAM User Permissions",
         "Effect": "Allow",
         "Principal": {
-          "AWS": "arn:aws:iam::050297369388:root"
+          "AWS": ["arn:aws:iam::050297369388:root",aws_iam_role.ec2_EC2-CSYE6225role.arn]
         },
         "Action": "kms:*",
         "Resource": "*"
+      },
+      {
+        "Sid" : "Enable kms access for auto scaling",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : "arn:aws:iam::050297369388:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+        },
+        "Action" : "kms:*",
+        "Resource" : "*",
       }
     ]
   })
@@ -655,7 +674,7 @@ resource "aws_launch_template" "launch_config" {
   image_id      = var.ami-id
   instance_type = "t2.micro"
   key_name      =  "yao"
-
+  name = "launch_config"
 
   iam_instance_profile {
     name = aws_iam_instance_profile.ec2_profile.name
@@ -663,16 +682,18 @@ resource "aws_launch_template" "launch_config" {
 
   network_interfaces {
     associate_public_ip_address = true
-    subnet_id =  aws_subnet.public[0].id
+#    subnet_id =  aws_subnet.public[0].id
     security_groups = [aws_security_group.ec2-security-group.id]
   }
   user_data = base64encode(data.template_file.user_data.rendered)
 
    block_device_mappings {
-     device_name = "/dev/sdf"
+     device_name = "/dev/xvda"
+#     device_name = "/dev/sda1"
      ebs {
+       delete_on_termination = true
        volume_type = "gp2"
-       volume_size = 5
+       volume_size = 8
        encrypted   = true
        kms_key_id  = aws_kms_key.ec2_ebs_key.arn
      }
@@ -721,6 +742,7 @@ resource "aws_autoscaling_group" "autoscaling" {
     id = aws_launch_template.launch_config.id
     version = "$Latest"
   }
+
 }
 
 

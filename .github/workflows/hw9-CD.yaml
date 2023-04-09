@@ -1,0 +1,83 @@
+# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
+
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+
+
+name: HW-9 CD
+on:
+  pull_request:
+    branches:
+      - main
+    types: [closed]
+
+jobs:
+  get_ami_id:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+      REGION: ${{ secrets.REGION }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Get the image ID
+        run:
+          IMAGE_ID=$(aws ec2 describe-images --owners self \
+          --filters Name=is-public,Values=false Name=state,Values=available \
+          --query 'reverse(sort_by(Images, &CreationDate))[:1].ImageId' --output text )
+          echo "export IMAGE_ID=${IMAGE_ID}" >> $GITHUB_ENV
+
+  update_launch_template:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      REGION: ${{ secrets.REGION }}
+      steps:
+        - uses: actions/checkout@v3
+
+        - name: Check the IMAGE_ID
+          needs: get_ami_id
+          run:
+            echo $IMAGE_ID
+
+        - name: Get the LaunchTemplateId
+          needs: get_ami_id
+          run:
+            LAUNCH_TEMPLATE_ID=$(aws_demo ec2 describe-launch-templates \
+            --query "LaunchTemplates[?LaunchTemplateName=='launch_config'].LaunchTemplateId" \
+            --output text)
+            echo $LAUNCH_TEMPLATE_ID
+
+        - name: Update the LaunchTemplateVersion
+          needs: get_ami_id
+          run:
+            export LAUNCH_TEMPLATE_ID=${{ env.LAUNCH_TEMPLATE_ID }}
+            aws ec2 create-launch-template-version \
+            --launch-template-id $LAUNCH_TEMPLATE_ID \
+            --launch-template-data '{"ImageId":"'${IMAGE_ID}'", "InstanceType":"t2.micro"}'
+
+        - name: Update the auto_scaling_group
+          needs: get_ami_id
+          run:
+            aws autoscaling update-auto-scaling-group \
+            --auto-scaling-group-name asg \
+            --launch-template LaunchTemplateId=$LAUNCH_TEMPLATE_ID,Version='$Latest' \
+            --min-size 1 \
+            --max-size 3 \
+            --desired-capacity 1
+
+        - name: refresh
+          run:
+            aws_demo autoscaling start-instance-refresh \
+            --auto-scaling-group-name ags \
+
+
+
+

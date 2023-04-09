@@ -6,12 +6,12 @@
 # separate terms of service, privacy policy, and support
 
 
-name: HW-7 CD
-on:
-  pull_request:
-    branches:
-      - main
-    types: [closed]
+name: HW-8 CD
+#on:
+#  pull_request:
+#    branches:
+#      - main
+#    types: [closed]
 
 jobs:
   build-image:
