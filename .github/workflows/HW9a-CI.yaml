@@ -1,0 +1,64 @@
+# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
+
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+name: HW-9 CI
+on:
+  push:
+    branches:
+      - hw9
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  - hw9-CI:
+      runs-on: ubuntu-latest
+      env:
+        REGION: ${{ secrets.REGION }}
+        AWS_EC2_METADATA_DISABLED: true
+      steps:
+        - uses: actions/checkout@v3
+        - name: Configure AWS CLI
+          run: |
+            aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} --profile dev
+            aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }} --profile dev
+            aws configure set default.region $REGION --profile dev
+            aws configure set default.output json --profile dev
+  
+            aws configure set aws_access_key_id ${{ secrets.DEMO_AWS_ACCESS_KEY_ID }} --profile demo
+            aws configure set aws_secret_access_key ${{ secrets.DEMO_AWS_SECRET_ACCESS_KEY }} --profile demo
+            aws configure set default.region $REGION --profile demo
+            aws configure set default.output json --profile demo
+
+        - name: Create Launch Template Version.
+          id: create-launch-template
+          run: |
+            IMAGE_ID=$(aws --profile dev ec2 describe-images --owners self \
+            --filters Name=is-public,Values=false Name=state,Values=available \
+            --query 'reverse(sort_by(Images, &CreationDate))[:1].ImageId' \
+            --output text)
+  
+            LAUNCH_TEMPLATE_ID=$(aws --profile demo ec2 describe-launch-templates --query "LaunchTemplates[?LaunchTemplateName=='launch_config'].LaunchTemplateId" --output text)
+  
+            aws --profile demo ec2 create-launch-template-version --launch-template-id ${LAUNCH_TEMPLATE_ID} --launch-template-data '{"ImageId":"'${IMAGE_ID}'", "InstanceType":"t2.micro"}'
+  
+            echo "::set-output name=IMAGE_ID::${IMAGE_ID}"
+            echo "::set-output name=LAUNCH_TEMPLATE_ID::${LAUNCH_TEMPLATE_ID}"
+
+        - name: Update Auto Scaling Group
+          run: |
+            aws --profile demo autoscaling update-auto-scaling-group \
+            --auto-scaling-group-name asg \
+            --launch-template LaunchTemplateId=${{ steps.create-launch-template.outputs.LAUNCH_TEMPLATE_ID }},Version='$Latest' \
+            --min-size 1 \
+            --max-size 3 \
+            --desired-capacity 1
+
+        - name: Refresh Auto Scaling Group Instances
+          run: |
+            aws --profile demo autoscaling start-instance-refresh \
+            --auto-scaling-group-name asg
