@@ -69,7 +69,10 @@ jobs:
 
           LAUNCH_TEMPLATE_ID=$(aws --profile demo ec2 describe-launch-templates --query "LaunchTemplates[?LaunchTemplateName=='launch_config'].LaunchTemplateId" --output text)
 
-          aws --profile demo ec2 create-launch-template-version --launch-template-id ${LAUNCH_TEMPLATE_ID} --launch-template-data '{"ImageId":"'${IMAGE_ID}'", "InstanceType":"t2.micro"}'
+          aws --profile demo ec2 create-launch-template-version \
+          --launch-template-id ${LAUNCH_TEMPLATE_ID} \
+          --source-version 1\
+          --launch-template-data '{"ImageId":"'${IMAGE_ID}'", "InstanceType":"t2.micro"}'
 
           echo "::set-output name=IMAGE_ID::${IMAGE_ID}"
           echo "::set-output name=LAUNCH_TEMPLATE_ID::${LAUNCH_TEMPLATE_ID}"
