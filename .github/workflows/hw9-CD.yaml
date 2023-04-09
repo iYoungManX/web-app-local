@@ -72,6 +72,7 @@ jobs:
 
 
   update_launch_template:
+    needs: get_ami_id
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     env:
@@ -87,21 +88,21 @@ jobs:
           echo $IMAGE_ID
 
       - name: Get the LaunchTemplateId
-        run:
-          LAUNCH_TEMPLATE_ID=$(aws_demo ec2 describe-launch-templates \
+        run: |
+          LAUNCH_TEMPLATE_ID=$(aws ec2 describe-launch-templates \
           --query "LaunchTemplates[?LaunchTemplateName=='launch_config'].LaunchTemplateId" \
           --output text)
           echo $LAUNCH_TEMPLATE_ID
 
       - name: Update the LaunchTemplateVersion
-        run:
+        run: |
           export LAUNCH_TEMPLATE_ID=${{ env.LAUNCH_TEMPLATE_ID }}
           aws ec2 create-launch-template-version \
           --launch-template-id $LAUNCH_TEMPLATE_ID \
           --launch-template-data '{"ImageId":"'${IMAGE_ID}'", "InstanceType":"t2.micro"}'
 
       - name: Update the auto_scaling_group
-        run:
+        run: |
           aws autoscaling update-auto-scaling-group \
           --auto-scaling-group-name asg \
           --launch-template LaunchTemplateId=$LAUNCH_TEMPLATE_ID,Version='$Latest' \
@@ -110,8 +111,8 @@ jobs:
           --desired-capacity 1
 
       - name: refresh
-        run:
-          aws_demo autoscaling start-instance-refresh \
+        run: |
+          aws autoscaling start-instance-refresh \
           --auto-scaling-group-name ags \
 
 
