@@ -171,6 +171,24 @@ resource "aws_security_group" "rds_security-group" {
   }
 }
 
+resource "aws_kms_key" "rds_kms_key" {
+  description = "Example customer-managed KMS key"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement =[
+      {
+        "Sid": "Enable IAM User Permissions",
+        "Effect": "Allow",
+        "Principal": {
+          "AWS": "arn:aws:iam::050297369388:root"
+        },
+        "Action": "kms:*",
+        "Resource": "*"
+      }
+    ]
+  })
+}
+
 
 resource "aws_db_instance" "rds_instance" {
   engine                 = "mysql"
@@ -187,6 +205,8 @@ resource "aws_db_instance" "rds_instance" {
   vpc_security_group_ids = [aws_security_group.rds_security-group.id]
   parameter_group_name   = aws_db_parameter_group.mysql.name
   skip_final_snapshot    = true
+  storage_encrypted = true
+  kms_key_id = aws_kms_key.rds_kms_key.arn
 }
 
 
@@ -517,11 +537,11 @@ resource "aws_lb_listener" "aws_lb_listeners-demo" {
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = aws_acm_certificate_validation.valid.certificate_arn
-
+#  certificate_arn   = aws_acm_certificate_validation.valid.certificate_arn
+  certificate_arn = var.certificate_arn
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.ls_target_group.arn
+    target_group_arn = aws_lb_target_group.lb_target_group.arn
   }
 }
 #
@@ -544,23 +564,75 @@ resource "aws_lb_listener" "aws_lb_listeners-80" {
   protocol          = "HTTP"
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.ls_target_group.arn
+    target_group_arn = aws_lb_target_group.lb_target_group.arn
   }
 }
 
 
+resource "aws_kms_key" "ec2_ebs_key" {
+  description = "Example customer-managed KMS key"
+  # Allow the IAM user or role specified in the "principal" block to use the key
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        "Sid": "Enable IAM User Permissions",
+        "Effect": "Allow",
+        "Principal": {
+          "AWS": "arn:aws:iam::050297369388:root"
+        },
+        "Action": "kms:*",
+        "Resource": "*"
+      }
+    ]
+  })
+}
 
-resource "aws_launch_configuration" "launch_config" {
-  name_prefix                 = "launch_config"
-  image_id                    = var.ami-id
-  instance_type               = "t2.micro"
-  security_groups             = [aws_security_group.ec2-security-group.id]
-  associate_public_ip_address = true
-  key_name                    = "yao"
-  iam_instance_profile        = aws_iam_instance_profile.ec2_profile.name
 
-  user_data = <<-EOF
-      #!/bin/bash
+
+#resource "aws_launch_configuration" "launch_config" {
+#  name_prefix                 = "launch_config"
+#  image_id                    = var.ami-id
+#  instance_type               = "t2.micro"
+#  security_groups             = [aws_security_group.ec2-security-group.id]
+#  associate_public_ip_address = true
+#  key_name                    = "yao"
+#  iam_instance_profile        = aws_iam_instance_profile.ec2_profile.name
+#
+#    ebs_block_device {
+#      device_name = "/dev/sdf"
+#      volume_size = 5
+#      volume_type = "gp2"
+#      encrypted   = true
+#      kms_key_id  = aws_kms_key.ec2_ebs_key.key_id
+#    }
+#
+#
+#  user_data = <<-EOF
+#      #!/bin/bash
+#      sudo chmod -v 777 /etc/environment
+#      # Set environment variables for the application
+#      echo "DB_PASSWORD=${var.db-password}">> /etc/environment
+#      echo "DB_HOST=${aws_db_instance.rds_instance.endpoint}">> /etc/environment
+#      echo "DB_NAME=${var.db-name}">> /etc/environment
+#      echo "DB_USERNAME=${var.db-username}">> /etc/environment
+#      echo "BUCKET_NAME=${aws_s3_bucket.private_bucket.bucket}">> /etc/environment
+#      echo "REGION=${var.region}">> /etc/environment
+#      sudo systemctl daemon-reload
+#      sudo systemctl start myapp.service
+#      sudo systemctl enable myapp
+#      sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/deployment/cloudwatch-config.json -s
+#    EOF
+#
+#  lifecycle {
+#    create_before_destroy = true
+#  }
+#}
+
+
+data "template_file" "user_data" {
+  template = <<-EOF
+    #!/bin/bash
       sudo chmod -v 777 /etc/environment
       # Set environment variables for the application
       echo "DB_PASSWORD=${var.db-password}">> /etc/environment
@@ -573,14 +645,44 @@ resource "aws_launch_configuration" "launch_config" {
       sudo systemctl start myapp.service
       sudo systemctl enable myapp
       sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/deployment/cloudwatch-config.json -s
-    EOF
-
-  lifecycle {
-    create_before_destroy = true
-  }
+  EOF
 }
 
-resource "aws_lb_target_group" "ls_target_group" {
+
+
+
+resource "aws_launch_template" "launch_config" {
+  image_id      = var.ami-id
+  instance_type = "t2.micro"
+  key_name      =  "yao"
+
+
+  iam_instance_profile {
+    name = aws_iam_instance_profile.ec2_profile.name
+  }
+
+  network_interfaces {
+    associate_public_ip_address = true
+    subnet_id =  aws_subnet.public[0].id
+    security_groups = [aws_security_group.ec2-security-group.id]
+  }
+  user_data = base64encode(data.template_file.user_data.rendered)
+
+   block_device_mappings {
+     device_name = "/dev/sdf"
+     ebs {
+       volume_type = "gp2"
+       volume_size = 5
+       encrypted   = true
+       kms_key_id  = aws_kms_key.ec2_ebs_key.arn
+     }
+   }
+}
+
+
+
+
+resource "aws_lb_target_group" "lb_target_group" {
   name_prefix = "tg"
   port        = 8080
   protocol    = "HTTP"
@@ -601,9 +703,9 @@ resource "aws_lb_target_group" "ls_target_group" {
 
 resource "aws_autoscaling_group" "autoscaling" {
   name                      = "asg"
-  launch_configuration      = aws_launch_configuration.launch_config.id
+#  launch_configuration      = aws_launch_configuration.launch_config.id
   min_size                  = 1
-  max_size                  = 5
+  max_size                  = 3
   desired_capacity          = 1
 #  health_check_grace_period = 300
   health_check_type         = "EC2"
@@ -613,8 +715,12 @@ resource "aws_autoscaling_group" "autoscaling" {
     aws_subnet.public[0].id,aws_subnet.public[1].id,aws_subnet.public[2].id
   ]
   target_group_arns = [
-    aws_lb_target_group.ls_target_group.arn
+    aws_lb_target_group.lb_target_group.arn
   ]
+  launch_template {
+    id = aws_launch_template.launch_config.id
+    version = "$Latest"
+  }
 }
 
 

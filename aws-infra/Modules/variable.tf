@@ -81,6 +81,10 @@ variable "demo-zone-id" {
   default = "iyoungman.me"
 }
 
+variable "certificate_arn" {
+  default = "arn:aws:acm:us-west-2:050297369388:certificate/d1665867-6367-4926-9388-e8a9b0a87cca"
+}
+
 
 
 
