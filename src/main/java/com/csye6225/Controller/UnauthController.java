@@ -18,4 +18,12 @@ public class UnauthController {
         statsDClient.incrementCounter(Metrics.GET_HEALTHZ);
         return "Healthy";
     }
+
+
+    @GetMapping("/health")
+    public String heahlth2(){
+        log.info("GET /healthy");
+        statsDClient.incrementCounter(Metrics.GET_HEALTHZ);
+        return "Healthy!!!!";
+    }
 }
